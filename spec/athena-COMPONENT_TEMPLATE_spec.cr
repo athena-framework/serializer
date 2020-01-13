@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe Athena::NAMESPACE_NAME do
+describe Athena::Serializer do
   it "works" do
     false.should eq(true)
   end
