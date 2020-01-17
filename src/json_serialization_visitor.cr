@@ -1,10 +1,14 @@
 require "json"
 
 struct Athena::Serializer::JSONVisitor < Athena::Serializer::SerializationVisitorInterface
-  def initialize(io : IO) : Nil
+  def initialize(io : IO, **named_args) : Nil
     @builder = JSON::Builder.new io
+    if indent = named_args["indent"]?
+      @builder.indent = indent
+    end
   end
 
+  # :inherit:
   def accept(properties : Array(Metadata)) : Nil
     @builder.document do
       @builder.object do
@@ -24,27 +28,33 @@ struct Athena::Serializer::JSONVisitor < Athena::Serializer::SerializationVisito
     end
   end
 
-  def visit(data : Nil) : Nil
+  protected def visit(data : Nil) : Nil
     @builder.null
   end
 
-  def visit(data : String) : Nil
+  protected def visit(data : String) : Nil
     @builder.string data
   end
 
-  def visit(data : Number) : Nil
+  protected def visit(data : Number) : Nil
     @builder.number data
   end
 
-  def visit(data : Bool) : Nil
+  protected def visit(data : Bool) : Nil
     @builder.bool data
   end
 
-  def visit(data : Serializable) : Nil
-    accept data.serialization_properties
+  protected def visit(data : Serializable) : Nil
+    @builder.object do
+      data.serialization_properties.each do |prop|
+        @builder.field(prop.name) do
+          visit prop.value
+        end
+      end
+    end
   end
 
-  def visit(data : Hash) : Nil
+  protected def visit(data : Hash) : Nil
     @builder.object do
       data.each do |key, value|
         @builder.field key.to_s do
@@ -54,7 +64,7 @@ struct Athena::Serializer::JSONVisitor < Athena::Serializer::SerializationVisito
     end
   end
 
-  def visit(data : Enumerable) : Nil
+  protected def visit(data : Enumerable) : Nil
     @builder.array do
       data.each { |v| visit v }
     end

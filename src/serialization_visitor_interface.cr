@@ -1,14 +1,10 @@
 abstract struct Athena::Serializer::SerializationVisitorInterface
   abstract def initialize(io : IO) : Nil
 
-  # Accept and serialize the provided *properties*.
-  #
-  # This overload is intended for `ASR::Serializable` types.
+  # Entrypoint for serializing `ASR::Serializable` types.  Should only be called once at the start of serializaiton.
   abstract def accept(properties : Array(Metadata)) : Nil
 
-  # Accept and serialize the provided *data*.
-  #
-  # This overload is intended to support primitive types.
+  # Entrypoint for serializing primitive types.  Should only be called once at the start of serializaiton.
   abstract def accept(data : _) : Nil
 
   abstract def visit(data : Nil) : Nil

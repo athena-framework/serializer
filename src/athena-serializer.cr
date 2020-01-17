@@ -10,6 +10,15 @@ alias ASR = Athena::Serializer
 module Athena::Serializer
   enum Format
     JSON
+
+    # Returns the `ASR::SerializationVisitorInterface` to use with `self`.
+    def serialization_visitor : ASR::SerializationVisitorInterface.class
+      case self
+      when .json? then ASR::JSONVisitor
+      else
+        raise "unreachable"
+      end
+    end
   end
 
   module Serializable
@@ -32,19 +41,3 @@ module Athena::Serializer
     end
   end
 end
-
-class Bar
-  include ASR::Serializable
-
-  getter id, active
-
-  def initialize(@id : String? = nil, @active = true); end
-end
-
-serializer = ASR::Serializer.new
-
-obj = Bar.new "foo", false
-
-puts serializer.serialize obj, :json
-puts serializer.serialize "foo", :json
-puts serializer.serialize [1, 2, 3], :json
