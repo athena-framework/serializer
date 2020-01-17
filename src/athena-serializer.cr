@@ -1,5 +1,4 @@
 require "./context"
-require "./navigator_interface"
 require "./serialization_visitor_interface"
 require "./json_serialization_visitor"
 require "./serializer_interface"
@@ -9,7 +8,9 @@ require "./property_metadata"
 alias ASR = Athena::Serializer
 
 module Athena::Serializer
-  module Format; end
+  enum Format
+    JSON
+  end
 
   module Serializable
     abstract def serialization_properties : Array(ASR::Metadata)
@@ -32,30 +33,6 @@ module Athena::Serializer
   end
 end
 
-require "json"
-
-module JSON
-  include ASR::Format
-
-  # Overload for Objects
-  def self.serialize(properties : Array(ASR::Metadata)) : String
-    String.build do |str|
-      JSON.build(str) do |builder|
-        ASR::JSONVisitor.new(builder).accept properties
-      end
-    end
-  end
-
-  # Overload for primitive types
-  def self.serialize(obj : _) : String
-    String.build do |str|
-      JSON.build(str) do |builder|
-        ASR::JSONVisitor.new(builder).visit obj
-      end
-    end
-  end
-end
-
 class Bar
   include ASR::Serializable
 
@@ -68,4 +45,6 @@ serializer = ASR::Serializer.new
 
 obj = Bar.new "foo", false
 
-puts serializer.serialize obj, JSON
+puts serializer.serialize obj, :json
+puts serializer.serialize "foo", :json
+puts serializer.serialize [1, 2, 3], :json

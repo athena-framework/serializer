@@ -1,16 +1,28 @@
 struct Athena::Serializer::Serializer
   include Athena::Serializer::SerializerInterface
 
-  # def initialize(@navigators : Hash)
+  @visitors : Hash(ASR::Format, ASR::SerializationVisitorInterface.class)
 
-  def serialize(data : _, format : Format.class) : String
-    unless data.is_a? Serializable
-      return format.serialize data
+  def initialize(*, visitors : Array(ASR::SerializationVisitorInterface.class)? = nil)
+    @visitors = Hash(ASR::Format, ASR::SerializationVisitorInterface.class).new
+
+    @visitors[ASR::Format::JSON] = ASR::JSONVisitor
+
+    # visitor_arr.each do |visitor|
+    #   @visitors[visitor.format] = visitor
+    # end
+  end
+
+  def serialize(data : _, format : ASR::Format) : String
+    String.build do |str|
+      serialize data, format, str
     end
-
-    format.serialize data.serialization_properties
   end
 
-  private def visit(navigator, visitor, context, data, format)
+  def serialize(data : _, format : ASR::Format, io : IO) : Nil
+    @visitors[format].new(io).accept data.is_a?(ASR::Serializable) ? data.serialization_properties : data
   end
+
+  # private def visit(navigator, visitor, context, data, format, io)
+  # end
 end

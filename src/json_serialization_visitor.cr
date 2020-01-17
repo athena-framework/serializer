@@ -1,15 +1,26 @@
-class Athena::Serializer::JSONVisitor
-  include Athena::Serializabe::SerializationVisitorInterface
+require "json"
 
-  def initialize(@builder : JSON::Builder); end
+struct Athena::Serializer::JSONVisitor < Athena::Serializer::SerializationVisitorInterface
+  def initialize(io : IO) : Nil
+    @builder = JSON::Builder.new io
+  end
 
   def accept(properties : Array(Metadata)) : Nil
-    @builder.object do
-      properties.each do |prop|
-        @builder.field(prop.name) do
-          visit prop.value
+    @builder.document do
+      @builder.object do
+        properties.each do |prop|
+          @builder.field(prop.name) do
+            visit prop.value
+          end
         end
       end
+    end
+  end
+
+  # :inherit:
+  def accept(data : _) : Nil
+    @builder.document do
+      visit data
     end
   end
 
