@@ -9,11 +9,13 @@ class Athena::Serializer::Visitors::JSONVisitor < Athena::Serializer::Visitors::
     if indent = named_args["indent"]?
       @builder.indent = indent
     end
+  end
 
+  def prepare : Nil
     @builder.start_document
   end
 
-  def finish
+  def finish : Nil
     @builder.end_document
   end
 

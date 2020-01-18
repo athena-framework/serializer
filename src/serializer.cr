@@ -17,6 +17,8 @@ struct Athena::Serializer::Serializer
     visitor.navigator = navigator
     navigator.init # context
 
+    visitor.prepare
+
     navigator.accept data
 
     visitor.finish

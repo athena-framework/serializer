@@ -1,5 +1,8 @@
 abstract class Athena::Serializer::Visitors::SerializationVisitorInterface
-  # abstract def initialize(io : IO) : Nil
+  abstract def initialize(io : IO) : Nil
+
+  abstract def prepare : Nil
+  abstract def finish : Nil
 
   abstract def visit(data : Nil) : Nil
   abstract def visit(data : String) : Nil
