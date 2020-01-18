@@ -51,7 +51,7 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
     @builder.mapping do
       data.each do |key, value|
         @builder.scalar key
-        @builder.scalar visit value
+        visit value
       end
     end
   end

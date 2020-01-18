@@ -107,32 +107,3 @@ module Athena::Serializer
     end
   end
 end
-
-class Bar
-  include ASR::Serializable
-
-  getter id, active
-
-  def initialize(@id : String? = nil, @active = true); end
-
-  @[ASR::Annotations::VirtualProperty]
-  def nested : String
-    "NEST"
-  end
-end
-
-class Foo
-  include ASR::Serializable
-
-  getter id, bar
-
-  def initialize(@id : Int32, @bar : Bar); end
-end
-
-serializer = ASR::Serializer.new
-
-obj = Foo.new 99, Bar.new "foo", false
-
-puts serializer.serialize obj, :json
-puts serializer.serialize "foo", :json
-puts serializer.serialize [1, 2, 3], :json
