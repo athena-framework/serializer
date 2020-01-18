@@ -1,49 +1,46 @@
-require "json"
-require "./serialization_visitor_interface"
+require "yaml"
 
-class Athena::Serializer::Visitors::JSONSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
+class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
   property! navigator : ASR::Navigators::SerializationNavigator
 
   def initialize(io : IO, **named_args) : Nil
-    @builder = JSON::Builder.new io
-    if indent = named_args["indent"]?
-      @builder.indent = indent
-    end
+    @builder = YAML::Builder.new io
   end
 
   def prepare : Nil
+    @builder.start_stream
     @builder.start_document
   end
 
   def finish : Nil
     @builder.end_document
+    @builder.end_stream
   end
 
   # :inherit:
   def visit(properties : Array(Metadata)) : Nil
-    @builder.object do
+    @builder.mapping do
       properties.each do |prop|
-        @builder.field(prop.external_name) do
-          visit prop.value
-        end
+        @builder.scalar prop.external_name
+        visit prop.value
       end
     end
   end
 
   def visit(data : Nil) : Nil
-    @builder.null
+    @builder.scalar data
   end
 
   def visit(data : String) : Nil
-    @builder.string data
+    @builder.scalar data
   end
 
   def visit(data : Number) : Nil
-    @builder.number data
+    @builder.scalar data
   end
 
   def visit(data : Bool) : Nil
-    @builder.bool data
+    @builder.scalar data
   end
 
   def visit(data : Serializable) : Nil
@@ -51,17 +48,16 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor < Athena::Serialize
   end
 
   def visit(data : Hash) : Nil
-    @builder.object do
+    @builder.mapping do
       data.each do |key, value|
-        @builder.field key.to_s do
-          visit value
-        end
+        @builder.scalar key
+        @builder.scalar visit value
       end
     end
   end
 
   def visit(data : Enumerable) : Nil
-    @builder.array do
+    @builder.sequence do
       data.each { |v| visit v }
     end
   end

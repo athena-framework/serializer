@@ -11,4 +11,5 @@ abstract class Athena::Serializer::Visitors::SerializationVisitorInterface
   abstract def visit(data : Array | Set | Deque | Tuple) : Nil
   abstract def visit(data : Hash) : Nil
   abstract def visit(data : Serializable) : Nil
+  abstract def visit(data : Array(Metadata)) : Nil
 end

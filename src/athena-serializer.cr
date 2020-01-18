@@ -16,11 +16,13 @@ alias ASR = Athena::Serializer
 module Athena::Serializer
   enum Format
     JSON
+    YAML
 
     # Returns the `ASR::SerializationVisitorInterface` to use with `self`.
     def serialization_visitor : ASR::Visitors::SerializationVisitorInterface.class
       case self
-      when .json? then ASR::Visitors::JSONVisitor
+      when .json? then ASR::Visitors::JSONSerializationVisitor
+      when .yaml? then ASR::Visitors::YAMLSerializationVisitor
       else
         raise "unreachable"
       end
