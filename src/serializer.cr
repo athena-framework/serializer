@@ -11,11 +11,10 @@ struct Athena::Serializer::Serializer
     # Initialize the context.  Currently just used to apply default exclusion strategies
     context.init
 
-    visitor = format.serialization_visitor.new(io, **named_args)
+    visitor = format.serialization_visitor.new(io, named_args)
     navigator = ASR::Navigators::SerializationNavigator.new visitor, context
 
     visitor.navigator = navigator
-    navigator.init # context
 
     visitor.prepare
 

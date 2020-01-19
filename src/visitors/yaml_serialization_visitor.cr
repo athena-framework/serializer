@@ -1,9 +1,9 @@
 require "yaml"
 
 class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
-  property! navigator : ASR::Navigators::SerializationNavigator
+  property! navigator : Athena::Serializer::Navigators::NavigatorInterface
 
-  def initialize(io : IO, **named_args) : Nil
+  def initialize(io : IO, named_args : NamedTuple) : Nil
     @builder = YAML::Builder.new io
   end
 
@@ -27,19 +27,7 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
     end
   end
 
-  def visit(data : Nil) : Nil
-    @builder.scalar data
-  end
-
-  def visit(data : String) : Nil
-    @builder.scalar data
-  end
-
-  def visit(data : Number) : Nil
-    @builder.scalar data
-  end
-
-  def visit(data : Bool) : Nil
+  def visit(data : String | Symbol | Number | Bool | Nil) : Nil
     @builder.scalar data
   end
 
@@ -47,7 +35,7 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
     navigator.accept data
   end
 
-  def visit(data : Hash) : Nil
+  def visit(data : Hash | NamedTuple) : Nil
     @builder.mapping do
       data.each do |key, value|
         @builder.scalar key
@@ -60,5 +48,17 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
     @builder.sequence do
       data.each { |v| visit v }
     end
+  end
+
+  def visit(data : JSON::Any | YAML::Any) : Nil
+    visit data.raw
+  end
+
+  def visit(data : Time) : Nil
+    visit data.to_rfc3339
+  end
+
+  def visit(data : Enum) : Nil
+    visit data.value
   end
 end

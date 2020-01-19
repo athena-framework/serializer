@@ -1,6 +1,4 @@
-# [CrSerializer](./index.html) uses annotations to control how an object gets serialized and deserialized.
-# This module includes all the default serialization and deserialization annotations. The `CRS` alias can be used as a shorthand when applying the annotations.
-module Athena::Serializer::Annotations
+module Athena::Serializer
   # Defines the method to use to get/set the property's value.
   #
   # TODO: Implement `setter`.

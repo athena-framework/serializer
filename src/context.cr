@@ -36,13 +36,13 @@ abstract class Athena::Serializer::Context
   def init : Nil
     raise Exception.new "This context was already initialized, and cannot be re-used." if @initialized
 
-    # if v = @version
-    #   add_exclusion_strategy ASR::ExclusionStrategies::Version.new v
-    # end
+    if v = @version
+      add_exclusion_strategy ASR::ExclusionStrategies::Version.new v
+    end
 
-    # if g = @groups
-    #   add_exclusion_strategy ASR::ExclusionStrategies::Groups.new g
-    # end
+    if g = @groups
+      add_exclusion_strategy ASR::ExclusionStrategies::Groups.new g
+    end
 
     @initialized = true
   end

@@ -1,7 +1,11 @@
 module Athena::Serializer::Metadata; end
 
-struct Athena::Serializer::PropertyMetadata(IvarType, ClassType)
+module Athena::Serializer::PropertyMetadataBase
   include Athena::Serializer::Metadata
+end
+
+struct Athena::Serializer::PropertyMetadata(IvarType, ClassType)
+  include Athena::Serializer::PropertyMetadataBase
 
   # The name of the property.
   getter name : String

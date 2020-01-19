@@ -1,7 +1,4 @@
-class Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializer::Navigators::Navigator
-  def init : Nil
-  end
-
+struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializer::Navigators::Navigator
   def accept(data : ASR::Serializable) : Nil
     properties = data.serialization_properties
 

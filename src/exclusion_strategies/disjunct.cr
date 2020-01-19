@@ -12,7 +12,7 @@ struct Athena::Serializer::ExclusionStrategies::Disjunct
   def initialize(@members : Array(ASR::ExclusionStrategies::ExclusionStrategyInterface)); end
 
   # :inherit:
-  def skip_property?(metadata : ASR::PropertyMetadata, context : ASR::Context) : Bool
+  def skip_property?(metadata : ASR::PropertyMetadataBase, context : ASR::Context) : Bool
     @members.any?(&.skip_property?(metadata, context))
   end
 end
