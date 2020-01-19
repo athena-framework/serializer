@@ -34,7 +34,7 @@ module Athena::Serializer
 
     macro included
       {% verbatim do %}
-        def serialization_properties : Array(ASR::PropertyMetadataBase) 
+        def serialization_properties : Array(ASR::PropertyMetadataBase)
           {% begin %}
             # Construct the array of metadata from the properties on `self`.
             # Takes into consideration some annotations to control how/when a property should be serialized
