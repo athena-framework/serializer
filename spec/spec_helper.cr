@@ -47,6 +47,7 @@ class TestVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
   end
 
   def visit(data : _) : Nil
+    @io << data
   end
 end
 
@@ -93,4 +94,21 @@ def assert_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.cl
   visitor.finish
 
   io.rewind.gets_to_end.should eq expected
+end
+
+def create_metadata(*, name : String = "name", external_name : String = "external_name", value : I = "value", skip_when_empty : Bool = false, groups : Array(String) = ["default"], since_version : String? = nil, until_version : String? = nil) : ASR::PropertyMetadata forall I
+  context = ASR::PropertyMetadata(I, EmptyObject).new name, external_name, value, skip_when_empty, groups
+
+  context.since_version = SemanticVersion.parse since_version if since_version
+  context.until_version = SemanticVersion.parse until_version if until_version
+
+  context
+end
+
+def assert_version(*, since_version : String? = nil, until_version : String? = nil) : Bool
+  ASR::ExclusionStrategies::Version.new(SemanticVersion.parse "1.0.0").skip_property?(create_metadata(since_version: since_version, until_version: until_version), ASR::SerializationContext.new)
+end
+
+def assert_groups(*, groups : Array(String), metadata_groups : Array(String) = ["default"]) : Bool
+  ASR::ExclusionStrategies::Groups.new(groups).skip_property?(create_metadata(groups: metadata_groups), ASR::SerializationContext.new)
 end
