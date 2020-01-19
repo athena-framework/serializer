@@ -20,7 +20,7 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor < Athena::Serialize
   end
 
   # :inherit:
-  def visit(properties : Array(Metadata)) : Nil
+  def visit(properties : Array(PropertyMetadataBase)) : Nil
     @builder.object do
       properties.each do |prop|
         @builder.field(prop.external_name) do
@@ -76,5 +76,9 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor < Athena::Serialize
 
   def visit(data : Enum) : Nil
     visit data.value
+  end
+
+  def visit(data : UUID) : Nil
+    visit data.to_s
   end
 end

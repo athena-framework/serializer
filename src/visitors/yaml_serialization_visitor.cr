@@ -18,7 +18,7 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
   end
 
   # :inherit:
-  def visit(properties : Array(Metadata)) : Nil
+  def visit(properties : Array(PropertyMetadataBase)) : Nil
     @builder.mapping do
       properties.each do |prop|
         @builder.scalar prop.external_name
@@ -60,5 +60,9 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serialize
 
   def visit(data : Enum) : Nil
     visit data.value
+  end
+
+  def visit(data : UUID) : Nil
+    visit data.to_s
   end
 end

@@ -44,6 +44,12 @@ describe ASR::Visitors::JSONSerializationVisitor do
       end
     end
 
+    it UUID do
+      assert_output(ASR::Visitors::JSONSerializationVisitor, %("f89dc089-2c6c-411a-af20-ea98f90376ef")) do |visitor|
+        visitor.visit UUID.new("f89dc089-2c6c-411a-af20-ea98f90376ef")
+      end
+    end
+
     describe Enumerable do
       it Array do
         assert_output(ASR::Visitors::JSONSerializationVisitor, "[1,2,3]") do |visitor|

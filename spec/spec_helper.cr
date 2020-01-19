@@ -1,6 +1,8 @@
 require "spec"
 require "../src/athena-serializer"
 
+require "./models/*"
+
 enum TestEnum
   Zero
   One
@@ -26,6 +28,28 @@ class TestObject
   getter nest : NestedType = NestedType.new
 end
 
+class TestVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
+  def initialize(@io : IO, named_args : NamedTuple) : Nil
+  end
+
+  def assert_properties(handler : Proc(Array(ASR::PropertyMetadataBase), Nil)) : Nil
+    @assert_properties = handler
+  end
+
+  def prepare : Nil
+  end
+
+  def finish : Nil
+  end
+
+  def visit(data : Array(ASR::PropertyMetadataBase)) : Nil
+    @assert_properties.try &.call data
+  end
+
+  def visit(data : _) : Nil
+  end
+end
+
 private struct TestNavigator < Athena::Serializer::Navigators::Navigator
   def accept(data : ASR::Serializable) : Nil
     @visitor.visit data.serialization_properties
@@ -46,6 +70,12 @@ def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
     since_version: nil,
     until_version: nil,
   )] of ASR::PropertyMetadataBase
+end
+
+def create_visitor(&block : Array(ASR::PropertyMetadataBase) -> Nil)
+  visitor = TestVisitor.new IO::Memory.new, NamedTuple.new
+  visitor.assert_properties block
+  visitor
 end
 
 # Asserts the output of the given *visitor_type*.

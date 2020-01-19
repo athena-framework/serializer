@@ -1,4 +1,5 @@
 require "semantic_version"
+require "uuid"
 
 require "./annotations"
 require "./context"
@@ -31,9 +32,23 @@ module Athena::Serializer
 
   module Serializable
     abstract def serialization_properties : Array(ASR::PropertyMetadataBase)
+    abstract def run_preserialize : Nil
+    abstract def run_postserialize : Nil
 
     macro included
       {% verbatim do %}
+        def run_preserialize : Nil
+          {% for method in @type.methods.select { |m| m.annotation(ASR::PreSerialize) } %}
+            {{method.name}}
+          {% end %}
+        end
+
+        def run_postserialize : Nil
+          {% for method in @type.methods.select { |m| m.annotation(ASR::PostSerialize) } %}
+            {{method.name}}
+          {% end %}
+        end
+
         def serialization_properties : Array(ASR::PropertyMetadataBase)
           {% begin %}
             # Construct the array of metadata from the properties on `self`.

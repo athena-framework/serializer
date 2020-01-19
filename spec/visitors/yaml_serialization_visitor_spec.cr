@@ -44,6 +44,12 @@ describe ASR::Visitors::YAMLSerializationVisitor do
       end
     end
 
+    it UUID do
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "--- f89dc089-2c6c-411a-af20-ea98f90376ef\n") do |visitor|
+        visitor.visit UUID.new("f89dc089-2c6c-411a-af20-ea98f90376ef")
+      end
+    end
+
     describe Enumerable do
       it Array do
         assert_output(ASR::Visitors::YAMLSerializationVisitor, "---\n- 1\n- 2\n- 3\n") do |visitor|

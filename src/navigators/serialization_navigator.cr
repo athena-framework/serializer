@@ -1,15 +1,15 @@
 struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializer::Navigators::Navigator
   def accept(data : ASR::Serializable) : Nil
-    properties = data.serialization_properties
+    data.run_preserialize
 
-    # properties.run_preserialize
+    properties = data.serialization_properties
 
     # Apply exclusion strategies if one is defined
     if strategy = @context.exclusion_strategy
       properties.reject! { |property| strategy.skip_property? property, @context }
     end
 
-    # Reject properties that shoud be skipped when empty
+    # Reject properties that should be skipped when empty
     # or properties that should be skipped when nil
     properties.reject! do |property|
       val = property.value
@@ -22,7 +22,7 @@ struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializ
     # Process properties
     @visitor.visit properties
 
-    # properties.run_postserializ
+    data.run_postserialize
   end
 
   def accept(data : _) : Nil
