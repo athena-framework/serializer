@@ -46,25 +46,25 @@ describe ASR::Visitors::YAMLSerializationVisitor do
 
     describe Enumerable do
       it Array do
-        assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "---\n- 1\n- 2\n- 3\n") do |visitor|
+        assert_output(ASR::Visitors::YAMLSerializationVisitor, "---\n- 1\n- 2\n- 3\n") do |visitor|
           visitor.visit [1, 2, 3]
         end
       end
 
       it Set do
-        assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "---\n- 1\n- 2\n- 3\n") do |visitor|
+        assert_output(ASR::Visitors::YAMLSerializationVisitor, "---\n- 1\n- 2\n- 3\n") do |visitor|
           visitor.visit Set{1, 2, 3}
         end
       end
 
       it Deque do
-        assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "---\n- 1\n- 2\n- 3\n") do |visitor|
+        assert_output(ASR::Visitors::YAMLSerializationVisitor, "---\n- 1\n- 2\n- 3\n") do |visitor|
           visitor.visit Deque{1, 2, 3}
         end
       end
 
       it Tuple do
-        assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "---\n- 1\n- 2\n- 3\n") do |visitor|
+        assert_output(ASR::Visitors::YAMLSerializationVisitor, "---\n- 1\n- 2\n- 3\n") do |visitor|
           visitor.visit({1, 2, 3})
         end
       end
@@ -77,13 +77,13 @@ describe ASR::Visitors::YAMLSerializationVisitor do
     end
 
     it Hash do
-      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string %(---\nkey: value\nvalues:\n- 1\n- foo\n- false\n)) do |visitor|
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, %(---\nkey: value\nvalues:\n- 1\n- foo\n- false\n)) do |visitor|
         visitor.visit({"key" => "value", "values" => [1, "foo", false]})
       end
     end
 
     it NamedTuple do
-      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string %(---\nspace key: 123.12\n)) do |visitor|
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, %(---\nspace key: 123.12\n)) do |visitor|
         visitor.visit({"space key": 123.12})
       end
     end
@@ -109,19 +109,19 @@ describe ASR::Visitors::YAMLSerializationVisitor do
 
   describe ASR::Serializable do
     it "empty object" do
-      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "--- {}\n") do |visitor|
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, "--- {}\n") do |visitor|
         visitor.visit EmptyObject.new
       end
     end
 
     it "valid object" do
-      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string %(---\nfoo: foo\nbar: 12.1\nnest:\n  active: true\n)) do |visitor|
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, %(---\nfoo: foo\nbar: 12.1\nnest:\n  active: true\n)) do |visitor|
         visitor.visit TestObject.new
       end
     end
 
     it Array(ASR::PropertyMetadataBase) do
-      assert_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string %(---\nexternal_name: YES\n)) do |visitor|
+      assert_output(ASR::Visitors::YAMLSerializationVisitor, %(---\nexternal_name: YES\n)) do |visitor|
         visitor.visit get_test_property_metadata
       end
     end
