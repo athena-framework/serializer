@@ -303,7 +303,7 @@ describe ASR::Navigators::SerializationNavigator do
     describe "primitive type" do
       it "should write the value" do
         io = IO::Memory.new
-        ASR::Navigators::SerializationNavigator.new(TestVisitor.new io, NamedTuple.new, ASR::SerializationContext.new).accept "FOO"
+        ASR::Navigators::SerializationNavigator.new(TestVisitor.new(io, NamedTuple.new), ASR::SerializationContext.new).accept "FOO"
         io.rewind.gets_to_end.should eq "FOO"
       end
     end
