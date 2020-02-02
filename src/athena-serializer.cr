@@ -153,11 +153,11 @@ module Athena::Serializer
           {% end %}
         end
 
-        def initialize(visitor : ASR::Visitors::DeserializationVisitorInterface, properties : Array(ASR::PropertyMetadataBase), data : JSON::Any)
+        def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : JSON::Any | YAML::Any)
           {% begin %}
             {% for ivar, idx in @type.instance_vars %}
               if (prop = properties.find { |p| p.name == {{ivar.name.stringify}} }) && ((val = data[prop.external_name]?) || ((key = prop.aliases.find { |a| data[a]? }) && (val = data[key]?)))
-                value = visitor.visit {{ivar.type}}, val
+                value = navigator.accept {{ivar.type}}, val
 
                 unless value.nil?
                   @{{ivar.id}} = value

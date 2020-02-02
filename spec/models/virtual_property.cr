@@ -1,6 +1,8 @@
 class VirtualProperty
   include ASR::Serializable
 
+  def initialize; end
+
   property foo : String = "foo"
 
   @[ASR::VirtualProperty]

@@ -1,6 +1,8 @@
 class Default
   include ASR::Serializable
 
+  def initialize; end
+
   property a : String = "A"
   property z : String = "Z"
   property two : String = "two"
@@ -16,6 +18,8 @@ end
 @[ASR::AccessorOrder(:alphabetical)]
 class Abc
   include ASR::Serializable
+
+  def initialize; end
 
   property a : String = "A"
   property z : String = "Z"
@@ -34,6 +38,8 @@ end
 @[ASR::AccessorOrder(:custom, order: ["two", "z", "get_val", "a", "one", "a_a"])]
 class Custom
   include ASR::Serializable
+
+  def initialize; end
 
   property a : String = "A"
   property z : String = "Z"

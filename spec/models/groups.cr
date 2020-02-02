@@ -1,6 +1,8 @@
 class Group
   include ASR::Serializable
 
+  def initialize; end
+
   @[ASR::Groups("list", "details")]
   property id : Int64 = 1
 

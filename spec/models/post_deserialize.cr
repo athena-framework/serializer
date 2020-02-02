@@ -2,6 +2,8 @@
 class PostDeserialize
   include ASR::Serializable
 
+  def initialize; end
+
   getter first_name : String?
   getter last_name : String?
 

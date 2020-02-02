@@ -1,6 +1,8 @@
 class SerializedName
   include ASR::Serializable
 
+  def initialize; end
+
   @[ASR::Name(serialize: "myAddress")]
   property my_home_address : String = "123 Fake Street"
 
@@ -14,6 +16,8 @@ end
 class DeserializedName
   include ASR::Serializable
 
+  def initialize; end
+
   @[ASR::Name(deserialize: "des")]
   property custom_name : Int32?
 
@@ -22,6 +26,8 @@ end
 
 class AliasName
   include ASR::Serializable
+
+  def initialize; end
 
   @[ASR::Name(aliases: ["val", "value", "some_value"])]
   property some_value : String?

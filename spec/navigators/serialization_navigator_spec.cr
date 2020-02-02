@@ -8,7 +8,7 @@ describe ASR::Navigators::SerializationNavigator do
         obj.name.should be_nil
         obj.age.should be_nil
 
-        visitor = create_visitor do |properties|
+        visitor = create_serialization_visitor do |properties|
           properties.size.should eq 2
           p = properties[0]
 
@@ -44,7 +44,7 @@ describe ASR::Navigators::SerializationNavigator do
         obj.name.should be_nil
         obj.age.should be_nil
 
-        visitor = create_visitor do |properties|
+        visitor = create_serialization_visitor do |properties|
           properties.size.should eq 2
           p = properties[0]
 
@@ -79,7 +79,7 @@ describe ASR::Navigators::SerializationNavigator do
         obj = SkipWhenEmpty.new
         obj.value = ""
 
-        visitor = create_visitor do |properties|
+        visitor = create_serialization_visitor do |properties|
           properties.should be_empty
         end
 
@@ -89,7 +89,7 @@ describe ASR::Navigators::SerializationNavigator do
       it "should serialize non-empty properties" do
         obj = SkipWhenEmpty.new
 
-        visitor = create_visitor do |properties|
+        visitor = create_serialization_visitor do |properties|
           properties.size.should eq 1
           p = properties[0]
 
@@ -111,7 +111,7 @@ describe ASR::Navigators::SerializationNavigator do
         it "should not include nil values" do
           obj = EmitNil.new
 
-          visitor = create_visitor do |properties|
+          visitor = create_serialization_visitor do |properties|
             properties.size.should eq 1
             p = properties[0]
 
@@ -134,7 +134,7 @@ describe ASR::Navigators::SerializationNavigator do
           ctx = ASR::SerializationContext.new
           ctx.emit_nil = true
 
-          visitor = create_visitor do |properties|
+          visitor = create_serialization_visitor do |properties|
             properties.size.should eq 2
             p = properties[0]
 
@@ -167,7 +167,7 @@ describe ASR::Navigators::SerializationNavigator do
         it "should include all properties" do
           obj = Group.new
 
-          visitor = create_visitor do |properties|
+          visitor = create_serialization_visitor do |properties|
             properties.size.should eq 4
 
             p = properties[0]
@@ -224,7 +224,7 @@ describe ASR::Navigators::SerializationNavigator do
           # normally this gets handled in the serializer instance
           ctx.init
 
-          visitor = create_visitor do |properties|
+          visitor = create_serialization_visitor do |properties|
             properties.size.should eq 2
 
             p = properties[0]
@@ -261,7 +261,7 @@ describe ASR::Navigators::SerializationNavigator do
           # normally this gets handled in the serializer instance
           ctx.init
 
-          visitor = create_visitor do |properties|
+          visitor = create_serialization_visitor do |properties|
             properties.size.should eq 3
 
             p = properties[0]
@@ -303,7 +303,7 @@ describe ASR::Navigators::SerializationNavigator do
     describe "primitive type" do
       it "should write the value" do
         io = IO::Memory.new
-        ASR::Navigators::SerializationNavigator.new(TestVisitor.new(io, NamedTuple.new), ASR::SerializationContext.new).accept "FOO"
+        ASR::Navigators::SerializationNavigator.new(TestSerializationVisitor.new(io, NamedTuple.new), ASR::SerializationContext.new).accept "FOO"
         io.rewind.gets_to_end.should eq "FOO"
       end
     end

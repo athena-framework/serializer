@@ -11,7 +11,11 @@ struct Athena::Serializer::Navigators::DeserializationNavigator < Athena::Serial
       properties.reject! { |property| strategy.skip_property? property, @context }
     end
 
-    @visitor.visit type, properties, data
+    result = @visitor.visit type, properties, data
+
+    result.run_postdeserialize
+
+    result
   end
 
   def accept(type : _, data : JSON::Any)

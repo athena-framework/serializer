@@ -114,7 +114,7 @@ describe ASR::Visitors::YAMLSerializationVisitor do
       end
     end
 
-    describe ASR::Serializable do
+    pending ASR::Serializable do
       it "empty object" do
         assert_output(ASR::Visitors::YAMLSerializationVisitor, "--- {}\n") do |visitor|
           visitor.visit EmptyObject.new

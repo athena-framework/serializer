@@ -12,10 +12,14 @@ end
 
 class EmptyObject
   include ASR::Serializable
+
+  def initialize; end
 end
 
 class NestedType
   include ASR::Serializable
+
+  def initialize; end
 
   getter active : Bool = true
 end
@@ -28,7 +32,7 @@ class TestObject
   getter nest : NestedType = NestedType.new
 end
 
-class TestVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
+class TestSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
   def initialize(@io : IO, named_args : NamedTuple) : Nil
   end
 
@@ -51,7 +55,33 @@ class TestVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
   end
 end
 
-private struct TestNavigator < Athena::Serializer::Navigators::Navigator
+class TestDeserializationVisitor < Athena::Serializer::Visitors::DeserializationVisitorInterface
+  def initialize(@io : IO) : Nil
+  end
+
+  def assert_properties(handler : Proc(Array(ASR::PropertyMetadataBase), ASR::Serializable)) : Nil
+    @assert_properties = handler
+  end
+
+  def prepare(data : IO | String)
+    data
+  end
+
+  def finish : Nil
+  end
+
+  def visit(type : _, properties : Array(ASR::PropertyMetadataBase), data : _)
+    @assert_properties.not_nil!.call properties
+  end
+
+  def visit(type : _, data : _) : Nil
+    @io << data
+  end
+end
+
+private struct TestSerializationNavigator < Athena::Serializer::Navigators::SerializationNavigatorInterface
+  def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
+
   def accept(data : ASR::Serializable) : Nil
     @visitor.visit data.serialization_properties
   end
@@ -73,8 +103,14 @@ def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
   )] of ASR::PropertyMetadataBase
 end
 
-def create_visitor(&block : Array(ASR::PropertyMetadataBase) -> Nil)
-  visitor = TestVisitor.new IO::Memory.new, NamedTuple.new
+def create_serialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> Nil)
+  visitor = TestSerializationVisitor.new IO::Memory.new, NamedTuple.new
+  visitor.assert_properties block
+  visitor
+end
+
+def create_deserialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> ASR::Serializable)
+  visitor = TestDeserializationVisitor.new IO::Memory.new
   visitor.assert_properties block
   visitor
 end
@@ -84,7 +120,7 @@ def assert_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.cl
   io = IO::Memory.new
 
   visitor = visitor_type.new io, named_args
-  navigator = TestNavigator.new visitor, ASR::SerializationContext.new
+  navigator = TestSerializationNavigator.new(visitor, ASR::SerializationContext.new)
   visitor.navigator = navigator
 
   visitor.prepare

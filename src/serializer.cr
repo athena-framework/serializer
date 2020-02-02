@@ -10,9 +10,7 @@ struct Athena::Serializer::Serializer
 
     visitor.navigator = navigator
 
-    data = visitor.prepare input_data
-
-    navigator.accept type, data
+    navigator.accept type, visitor.prepare input_data
   end
 
   def serialize(data : _, format : ASR::Format, context : ASR::SerializationContext = ASR::SerializationContext.new, **named_args) : String

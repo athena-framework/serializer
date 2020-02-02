@@ -1,7 +1,7 @@
 require "yaml"
 
 class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
-  property! navigator : Athena::Serializer::Navigators::NavigatorInterface
+  property! navigator : Athena::Serializer::Navigators::SerializationNavigatorInterface
 
   def initialize(io : IO, named_args : NamedTuple) : Nil
     @builder = YAML::Builder.new io

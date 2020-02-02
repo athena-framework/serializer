@@ -1,6 +1,8 @@
 class PostSerialize
   include ASR::Serializable
 
+  def initialize; end
+
   getter name : String?
   getter age : Int32?
 

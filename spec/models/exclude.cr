@@ -2,6 +2,8 @@
 class Exclude
   include ASR::Serializable
 
+  def initialize; end
+
   property name : String = "Jim"
 
   @[ASR::Exclude]

@@ -2,6 +2,8 @@
 class Expose
   include ASR::Serializable
 
+  def initialize; end
+
   @[ASR::Expose]
   property name : String = "Jim"
 
