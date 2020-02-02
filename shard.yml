@@ -11,7 +11,7 @@ repository: https://github.com/athena-framework/serializer
 documentation: https://athena-framework.github.io/serializer/Athena/Serializer.html
 
 description: |
-  Flexible object (de)serialization library.
+  Object (de)serialization library.
 
 authors:
   - Blacksmoke16 <blacksmoke16@eve.tools>

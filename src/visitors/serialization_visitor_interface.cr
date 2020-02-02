@@ -1,4 +1,4 @@
-abstract class Athena::Serializer::Visitors::SerializationVisitorInterface
+abstract class Athena::Serializer::Visitors::SerializationVisitorInterface < Athena::Serializer::Visitors::VisitorInterface
   abstract def initialize(io : IO, named_arguments : NamedTuple) : Nil
 
   abstract def prepare : Nil

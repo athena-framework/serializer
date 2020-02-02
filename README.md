@@ -1,7 +1,7 @@
 # Serializer
 
-[![Build Status](https://img.shields.io/github/workflow/status/athena-framework/serializer/CI)](https://github.com/athena-framework/serializer/actions)
-[![Latest release](https://img.shields.io/github/release/athena-framework/serializer.svg?style=flat-square)](https://github.com/athena-framework/serializer/releases)
+![CI](https://github.com/athena-framework/serializer/workflows/CI/badge.svg)
+[![Latest release](https://img.shields.io/github/release/athena-framework/serializer.svg)](https://github.com/athena-framework/serializer/releases)
 
 Flexible object (de)serialization library
 

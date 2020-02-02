@@ -1,5 +1,7 @@
 struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializer::Navigators::Navigator
-  def accept(data : ASR::Serializable) : Nil
+  def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
+
+  def accept(data : ASR::Serializable, type) : Nil
     data.run_preserialize
 
     properties = data.serialization_properties
@@ -25,7 +27,7 @@ struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializ
     data.run_postserialize
   end
 
-  def accept(data : _) : Nil
+  def accept(data : _, type) : Nil
     @visitor.visit data
   end
 end

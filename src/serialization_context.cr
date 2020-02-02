@@ -2,3 +2,6 @@
 class Athena::Serializer::SerializationContext < Athena::Serializer::Context
   property? emit_nil : Bool = false
 end
+
+class Athena::Serializer::DeserializationContext < Athena::Serializer::Context
+end
