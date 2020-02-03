@@ -20,7 +20,7 @@ module Athena::Serializer
     YAML
 
     # Returns the `ASR::SerializationVisitorInterface` to use with `self`.
-    def serialization_visitor : ASR::Visitors::SerializationVisitorInterface.class
+    def serialization_visitor # : ASR::Visitors::SerializationVisitorInterface.class
       case self
       when .json? then ASR::Visitors::JSONSerializationVisitor
       when .yaml? then ASR::Visitors::YAMLSerializationVisitor
@@ -29,7 +29,7 @@ module Athena::Serializer
       end
     end
 
-    def deserialization_visitor : ASR::Visitors::DeserializationVisitorInterface.class
+    def deserialization_visitor # : ASR::Visitors::DeserializationVisitorInterface.class
       case self
       when .json? then ASR::Visitors::JSONDeserializationVisitor
       else
@@ -73,7 +73,7 @@ module Athena::Serializer
             # Construct the array of metadata from the properties on `self`.
             # Takes into consideration some annotations to control how/when a property should be serialized
             {%
-              ivars = @type.instance_vars
+              instance_vars = @type.instance_vars
                 .reject { |ivar| ivar.annotation(ASR::Skip) }
                 .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }  # ExclusionPolicy:ALL && ivar not Exposed
                 .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) } # ExclusionPolicy:NONE && ivar is Excluded
@@ -81,7 +81,7 @@ module Athena::Serializer
 
             {% property_hash = {} of Nil => Nil %}
 
-            {% for ivar in ivars %}
+            {% for ivar in instance_vars %}
               {% external_name = (ann = ivar.annotation(ASR::Name)) && (name = ann[:serialize]) ? name : ivar.name.stringify %}
 
               {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{@type}).new(
@@ -130,16 +130,22 @@ module Athena::Serializer
             {% begin %}
               # Construct the array of metadata from the properties on `self`.
               # Takes into consideration some annotations to control how/when a property should be serialized
-              {%
-                ivars = @type.instance_vars
-                  .reject { |ivar| ivar.annotation(ASR::Skip) }
-                  .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
-                  .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }  # ExclusionPolicy:ALL && ivar not Exposed
-                  .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) } # ExclusionPolicy:NONE && ivar is Excluded
-                  .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) }
-              %}
+              {% instance_vars = @type.instance_vars
+                   # ameba:disable Lint/ShadowingOuterLocalVar
+                   .reject { |ivar| ivar.annotation(ASR::Skip) }
+                   # ameba:disable Lint/ShadowingOuterLocalVar
+                   .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
+                   # ExclusionPolicy:ALL && ivar not Exposed
+                   # ameba:disable Lint/ShadowingOuterLocalVar
+                   .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }
+                   # ExclusionPolicy:NONE && ivar is Excluded
+                   # ameba:disable Lint/ShadowingOuterLocalVar
+                   .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) }
+                   # ameba:disable Lint/ShadowingOuterLocalVar
+                   .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) } %}
 
-              {{ivars.map do |ivar|
+              # ameba:disable Lint/ShadowingOuterLocalVar
+              {{instance_vars.map do |ivar|
                   %(ASR::PropertyMetadata(#{ivar.type}?, #{@type}).new(
                     name: #{ivar.name.stringify},
                     external_name: #{(ann = ivar.annotation(ASR::Name)) && (name = ann[:deserialize]) ? name : ivar.name.stringify},
@@ -179,33 +185,57 @@ module Athena::Serializer
   end
 end
 
-class Parent
-  include ASR::Serializable
+# class Parent
+#   include ASR::Serializable
 
-  getter name : String?
+#   @[ASR::Name(aliases: ["n"])]
+#   getter name : String?
 
-  @[ASR::Skip]
-  getter password : String? = nil
-end
+#   @[ASR::Skip]
+#   getter password : String? = nil
 
-class User
-  include ASR::Serializable
+#   @[ASR::PostDeserialize]
+#   private def post_d_parent
+#     pp "DONE PARENT"
+#   end
+# end
 
-  @[ASR::Name(aliases: ["n"])]
-  getter name : String?
-  getter id : Int32
-  getter foo : Int32?
+# class User
+#   include ASR::Serializable
 
-  # getter parent : Parent
-end
+#   @[ASR::Name(aliases: ["n"])]
+#   getter name : String?
+#   getter id : Int32
+#   getter foo : Int32?
 
-serializer = ASR::Serializer.new
+#   getter parent : Parent
 
-json = %({"name":"Jim","id":19})
+#   @[ASR::PostDeserialize]
+#   private def post_d_user
+#     pp "DONE USER"
+#   end
+# end
 
-pp serializer.deserialize User, json, :json
-pp serializer.deserialize Int32, "17", :json
-# serializer.deserialize Int32 | Float32, "17.12", :json
-pp serializer.deserialize String?, %("fsd"), :json
-pp serializer.deserialize String?, "null", :json
-pp serializer.deserialize Array(Int32), "[1,2,3]", :json
+# serializer = ASR::Serializer.new
+
+# json = %({"n":"Jim","id":19,"parent":{"n":"Bob","password":"monkey123"}})
+
+# pp serializer.deserialize User, json, :json
+# pp serializer.deserialize Int32, "17", :json
+# v = serializer.deserialize Int32 | Float32, "17.12", :json
+# pp v
+# pp typeof(v)
+# pp serializer.deserialize String?, %("fsd"), :json
+# pp serializer.deserialize String?, "null", :json
+# v = serializer.deserialize Array(Int32), "[1,2,3]", :json
+# pp v
+# pp typeof(v)
+
+# enum TestEnum
+#   Zero
+#   One
+#   Two
+#   Three
+# end
+
+# pp serializer.deserialize TestEnum?, "0", :json

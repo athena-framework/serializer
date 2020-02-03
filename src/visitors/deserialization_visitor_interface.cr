@@ -1,7 +1,5 @@
-require "./visitor_interface"
-
-abstract class Athena::Serializer::Visitors::DeserializationVisitorInterface < Athena::Serializer::Visitors::VisitorInterface
-  abstract def prepare(data : IO | String)
+module Athena::Serializer::Visitors::DeserializationVisitorInterface
+  abstract def prepare(data : IO | String) : JSON::Any
 
   # abstract def visit(data : Number.class) : Nil
 end

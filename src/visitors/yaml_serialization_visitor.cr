@@ -1,6 +1,8 @@
 require "yaml"
 
-class Athena::Serializer::Visitors::YAMLSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
+class Athena::Serializer::Visitors::YAMLSerializationVisitor
+  include Athena::Serializer::Visitors::SerializationVisitorInterface
+
   property! navigator : Athena::Serializer::Navigators::SerializationNavigatorInterface
 
   def initialize(io : IO, named_args : NamedTuple) : Nil

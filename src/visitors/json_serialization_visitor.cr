@@ -1,8 +1,10 @@
 require "json"
 require "./serialization_visitor_interface"
 
-class Athena::Serializer::Visitors::JSONSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
-  property! navigator : Athena::Serializer::Navigators::NavigatorInterface
+class Athena::Serializer::Visitors::JSONSerializationVisitor
+  include Athena::Serializer::Visitors::SerializationVisitorInterface
+
+  property! navigator : Athena::Serializer::Navigators::SerializationNavigatorInterface
 
   def initialize(io : IO, named_args : NamedTuple) : Nil
     @builder = JSON::Builder.new io

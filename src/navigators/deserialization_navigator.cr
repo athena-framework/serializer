@@ -1,9 +1,16 @@
-require "./navigator"
+module Athena::Serializer::Navigators::DeserializationNavigatorInterface
+  abstract def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext)
 
-struct Athena::Serializer::Navigators::DeserializationNavigator < Athena::Serializer::Navigators::Navigator
+  abstract def accept(type : ASR::Serializable.class, data : JSON::Any) : ASR::Serializable
+  abstract def accept(type : _, data : JSON::Any)
+end
+
+struct Athena::Serializer::Navigators::DeserializationNavigator
+  include Athena::Serializer::Navigators::DeserializationNavigatorInterface
+
   def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext); end
 
-  def accept(type : ASR::Serializable.class, data : JSON::Any)
+  def accept(type : ASR::Serializable.class, data : JSON::Any) : ASR::Serializable
     properties = type.deserialization_properties
 
     # Apply exclusion strategies if one is defined

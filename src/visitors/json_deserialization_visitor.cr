@@ -1,64 +1,68 @@
 require "json"
 require "./serialization_visitor_interface"
 
-class Athena::Serializer::Visitors::JSONDeserializationVisitor < Athena::Serializer::Visitors::DeserializationVisitorInterface
-  property! navigator : Athena::Serializer::Navigators::NavigatorInterface
+class Athena::Serializer::Visitors::JSONDeserializationVisitor
+  include Athena::Serializer::Visitors::DeserializationVisitorInterface
+
+  property! navigator : Athena::Serializer::Navigators::DeserializationNavigatorInterface
+
+  def prepare(input : IO | String) : JSON::Any
+    JSON.parse input
+  end
+
+  # Use a macro to build out primitive types
+  {% begin %}
+    {%
+      primitives = {
+        Bool    => ".as_bool",
+        Float32 => ".as_f32",
+        Float64 => ".as_f",
+        Int32   => ".as_i",
+        Int64   => ".as_i64",
+        String  => ".as_s",
+      }
+    %}
+
+    {% for type, method in primitives %}
+      def visit(type : {{type}}.class, data : JSON::Any) : {{type}}
+        data{{method.id}}
+      end
+    {% end %}
+  {% end %}
+
+  def visit(type : Enum.class, data : JSON::Any) : Enum
+    if val = data.as_i64?
+      type.from_value val
+    elsif val = data.as_s?
+      type.parse val
+    else
+      raise "Couldn't parse #{type} from '#{data}'."
+    end
+  end
 
   def visit(type : ASR::Serializable.class, properties : Array(PropertyMetadataBase), data : JSON::Any)
     type.new navigator.as(ASR::Navigators::DeserializationNavigator), properties, data
   end
 
-  def visit(type : Int32.class, data : JSON::Any) : Int32
-    data.as_i
-  end
-
-  def visit(type : Int32?.class, data : JSON::Any) : Int32?
-    data.as_i?
-  end
-
-  def visit(type : Int64.class, data : JSON::Any) : Int64
-    data.as_i64
-  end
-
-  def visit(type : Int64?.class, data : JSON::Any) : Int64?
-    data.as_i64?
-  end
-
-  def visit(type : Float32?.class, data : JSON::Any) : Float32?
-    data.as_f32?
-  end
-
-  def visit(type : Float32.class, data : JSON::Any) : Float32
-    data.as_f32
-  end
-
-  def visit(type : Float64?.class, data : JSON::Any) : Float64?
-    data.as_f?
-  end
-
-  def visit(type : Float64.class, data : JSON::Any) : Float64
-    data.as_f
-  end
-
-  def visit(type : String?.class, data : JSON::Any) : String?
-    data.as_s?
-  end
-
   def visit(type : Nil.class, data : JSON::Any) : Nil
   end
 
-  def visit(type : Array(T).class, data : JSON::Any) : Array forall T
+  def visit(type : Enumerable(T).class, data : JSON::Any) : Array forall T
     data.as_a.map do |item|
+      visit T, item
+    end
+  end
+
+  def visit(type : Enumerable(T)?.class, data : JSON::Any) forall T
+    return nil unless arr = data.as_a?
+
+    arr.map do |item|
       visit T, item
     end
   end
 
   def visit(type : Union(T), data : JSON::Any) forall T
     type.new self, data
-  end
-
-  def prepare(input : IO | String) : JSON::Any
-    JSON.parse input
   end
 end
 
@@ -99,11 +103,11 @@ def Union.new(visitor : ASR::Visitors::DeserializationVisitorInterface, data : J
     {% else %}
       begin
         return visitor.visit {{type}}, data
-      rescue TypeCastError
+      rescue ex
         # Ignore
       end
     {% end %}
   {% end %}
 
-  raise "Couldn't parse #{self} from #{data}"
+  raise "Couldn't parse #{self} from '#{data}'."
 end

@@ -27,12 +27,16 @@ end
 class TestObject
   include ASR::Serializable
 
+  def initialize; end
+
   getter foo : Symbol = :foo
   getter bar : Float32 = 12.1_f32
   getter nest : NestedType = NestedType.new
 end
 
-class TestSerializationVisitor < Athena::Serializer::Visitors::SerializationVisitorInterface
+class TestSerializationVisitor
+  include Athena::Serializer::Visitors::SerializationVisitorInterface
+
   def initialize(@io : IO, named_args : NamedTuple) : Nil
   end
 
@@ -55,7 +59,9 @@ class TestSerializationVisitor < Athena::Serializer::Visitors::SerializationVisi
   end
 end
 
-class TestDeserializationVisitor < Athena::Serializer::Visitors::DeserializationVisitorInterface
+class TestDeserializationVisitor
+  include Athena::Serializer::Visitors::DeserializationVisitorInterface
+
   def initialize(@io : IO) : Nil
   end
 
@@ -63,8 +69,8 @@ class TestDeserializationVisitor < Athena::Serializer::Visitors::Deserialization
     @assert_properties = handler
   end
 
-  def prepare(data : IO | String)
-    data
+  def prepare(data : IO | String) : JSON::Any
+    JSON::Any.new ""
   end
 
   def finish : Nil
@@ -79,7 +85,9 @@ class TestDeserializationVisitor < Athena::Serializer::Visitors::Deserialization
   end
 end
 
-private struct TestSerializationNavigator < Athena::Serializer::Navigators::SerializationNavigatorInterface
+private struct TestSerializationNavigator
+  include Athena::Serializer::Navigators::SerializationNavigatorInterface
+
   def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
 
   def accept(data : ASR::Serializable) : Nil
@@ -87,6 +95,20 @@ private struct TestSerializationNavigator < Athena::Serializer::Navigators::Seri
   end
 
   def accept(data : _) : Nil
+    @visitor.visit data
+  end
+end
+
+private struct TestDeserializationNavigator
+  include Athena::Serializer::Navigators::DeserializationNavigatorInterface
+
+  def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext); end
+
+  def accept(type : ASR::Serializable.class, data : JSON::Any) : ASR::Serializable
+    @visitor.visit type, type.deserialization_properties, data
+  end
+
+  def accept(type : _, data : _)
     @visitor.visit data
   end
 end
@@ -115,8 +137,18 @@ def create_deserialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> 
   visitor
 end
 
+def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisitorInterface.class, type : _, data : _, expected : _)
+  visitor = visitor_type.new
+  navigator = TestDeserializationNavigator.new(visitor, ASR::DeserializationContext.new)
+  visitor.navigator = navigator
+
+  result = visitor.visit(type, visitor.prepare(data))
+  result.should eq expected
+  typeof(result).should eq type
+end
+
 # Asserts the output of the given *visitor_type*.
-def assert_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.class, expected : String, **named_args, & : ASR::Visitors::SerializationVisitorInterface -> Nil)
+def assert_serialized_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.class, expected : String, **named_args, & : ASR::Visitors::SerializationVisitorInterface -> Nil)
   io = IO::Memory.new
 
   visitor = visitor_type.new io, named_args

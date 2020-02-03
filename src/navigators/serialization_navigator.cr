@@ -1,9 +1,13 @@
-abstract struct Athena::Serializer::Navigators::SerializationNavigatorInterface < Athena::Serializer::Navigators::Navigator
-  abstract def accept(data : _)
-  abstract def accept(data : ASR::Serializable)
+module Athena::Serializer::Navigators::SerializationNavigatorInterface
+  abstract def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext)
+
+  abstract def accept(data : ASR::Serializable) : Nil
+  abstract def accept(data : _) : Nil
 end
 
-struct Athena::Serializer::Navigators::SerializationNavigator < Athena::Serializer::Navigators::SerializationNavigatorInterface
+struct Athena::Serializer::Navigators::SerializationNavigator
+  include Athena::Serializer::Navigators::SerializationNavigatorInterface
+
   def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
 
   def accept(data : ASR::Serializable) : Nil
