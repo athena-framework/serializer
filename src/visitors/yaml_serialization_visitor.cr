@@ -52,7 +52,7 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor
     end
   end
 
-  def visit(data : JSON::Any | YAML::Any) : Nil
+  def visit(data : ASR::Any) : Nil
     visit data.raw
   end
 

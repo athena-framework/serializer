@@ -2,12 +2,14 @@ require "semantic_version"
 require "uuid"
 
 require "./annotations"
+require "./any"
 require "./context"
 require "./serializer_interface"
 require "./serializer"
 require "./property_metadata"
 require "./serialization_context"
 
+require "./construction/*"
 require "./exclusion_strategies/*"
 require "./navigators/*"
 require "./visitors/*"
@@ -24,16 +26,13 @@ module Athena::Serializer
       case self
       when .json? then ASR::Visitors::JSONSerializationVisitor
       when .yaml? then ASR::Visitors::YAMLSerializationVisitor
-      else
-        raise "unreachable"
       end
     end
 
     def deserialization_visitor # : ASR::Visitors::DeserializationVisitorInterface.class
       case self
       when .json? then ASR::Visitors::JSONDeserializationVisitor
-      else
-        raise "unreachable"
+      when .yaml? then ASR::Visitors::YAMLDeserializationVisitor
       end
     end
   end
@@ -125,26 +124,21 @@ module Athena::Serializer
           {% end %}
         end
 
+        # :nodoc:
         def self.deserialization_properties : Array(ASR::PropertyMetadataBase)
           {% verbatim do %}
             {% begin %}
               # Construct the array of metadata from the properties on `self`.
               # Takes into consideration some annotations to control how/when a property should be serialized
               {% instance_vars = @type.instance_vars
-                   # ameba:disable Lint/ShadowingOuterLocalVar
                    .reject { |ivar| ivar.annotation(ASR::Skip) }
-                   # ameba:disable Lint/ShadowingOuterLocalVar
                    .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
                    # ExclusionPolicy:ALL && ivar not Exposed
-                   # ameba:disable Lint/ShadowingOuterLocalVar
                    .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }
                    # ExclusionPolicy:NONE && ivar is Excluded
-                   # ameba:disable Lint/ShadowingOuterLocalVar
                    .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) }
-                   # ameba:disable Lint/ShadowingOuterLocalVar
                    .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) } %}
 
-              # ameba:disable Lint/ShadowingOuterLocalVar
               {{instance_vars.map do |ivar|
                   %(ASR::PropertyMetadata(#{ivar.type}?, #{@type}).new(
                     name: #{ivar.name.stringify},
@@ -159,7 +153,12 @@ module Athena::Serializer
           {% end %}
         end
 
-        def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : JSON::Any | YAML::Any)
+        # :nodoc:
+        def apply(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
+          self.initialize navigator, properties, data
+        end
+
+        def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
           {% begin %}
             {% for ivar, idx in @type.instance_vars %}
               if (prop = properties.find { |p| p.name == {{ivar.name.stringify}} }) && ((val = data[prop.external_name]?) || ((key = prop.aliases.find { |a| data[a]? }) && (val = data[key]?)))
@@ -184,58 +183,3 @@ module Athena::Serializer
     end
   end
 end
-
-# class Parent
-#   include ASR::Serializable
-
-#   @[ASR::Name(aliases: ["n"])]
-#   getter name : String?
-
-#   @[ASR::Skip]
-#   getter password : String? = nil
-
-#   @[ASR::PostDeserialize]
-#   private def post_d_parent
-#     pp "DONE PARENT"
-#   end
-# end
-
-# class User
-#   include ASR::Serializable
-
-#   @[ASR::Name(aliases: ["n"])]
-#   getter name : String?
-#   getter id : Int32
-#   getter foo : Int32?
-
-#   getter parent : Parent
-
-#   @[ASR::PostDeserialize]
-#   private def post_d_user
-#     pp "DONE USER"
-#   end
-# end
-
-# serializer = ASR::Serializer.new
-
-# json = %({"n":"Jim","id":19,"parent":{"n":"Bob","password":"monkey123"}})
-
-# pp serializer.deserialize User, json, :json
-# pp serializer.deserialize Int32, "17", :json
-# v = serializer.deserialize Int32 | Float32, "17.12", :json
-# pp v
-# pp typeof(v)
-# pp serializer.deserialize String?, %("fsd"), :json
-# pp serializer.deserialize String?, "null", :json
-# v = serializer.deserialize Array(Int32), "[1,2,3]", :json
-# pp v
-# pp typeof(v)
-
-# enum TestEnum
-#   Zero
-#   One
-#   Two
-#   Three
-# end
-
-# pp serializer.deserialize TestEnum?, "0", :json

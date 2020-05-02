@@ -9,7 +9,7 @@ module Athena::Serializer::Visitors::SerializationVisitorInterface
   abstract def visit(data : Enum) : Nil
   abstract def visit(data : Enumerable) : Nil
   abstract def visit(data : Hash) : Nil
-  abstract def visit(data : JSON::Any) : Nil
+  abstract def visit(data : ASR::Any) : Nil
   abstract def visit(data : NamedTuple) : Nil
   abstract def visit(data : Nil) : Nil
   abstract def visit(data : Number) : Nil
