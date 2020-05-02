@@ -69,8 +69,8 @@ class TestDeserializationVisitor
     @assert_properties = handler
   end
 
-  def prepare(data : IO | String) : JSON::Any
-    JSON::Any.new ""
+  def prepare(data : IO | String) : ASR::Any
+    ASR::Any.new ""
   end
 
   def finish : Nil
@@ -104,11 +104,11 @@ private struct TestDeserializationNavigator
 
   def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext); end
 
-  def accept(type : ASR::Serializable.class, data : JSON::Any) : ASR::Serializable
+  def accept(type : ASR::Serializable.class, data : ASR::Any) : ASR::Serializable
     @visitor.visit type, type.deserialization_properties, data
   end
 
-  def accept(type : _, data : _)
+  def accept(type : _, data : ASR::Any)
     @visitor.visit data
   end
 end

@@ -47,15 +47,20 @@ describe ASR::Visitors::JSONDeserializationVisitor do
         assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Array(Int32)?, "[1,2,3]", [1, 2, 3]
       end
 
-      # it Set do
-      #   assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Array(Int32), "[1,2,3]", [1, 2, 3]
-      #   assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Array(Int32?), "[1,2,null]", [1, 2, nil]
-      #   assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Array(Int32)?, "[1,2,3]", [1, 2, 3]
-      # end
+      it Set do
+        assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Set(Int32), "[1,2,3]", Set{1, 2, 3}
+        assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Set(Int32?), "[1,2,null]", Set{1, 2, nil}
+        assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Set(Int32)?, "[1,2,3]", Set{1, 2, 3}
+      end
 
       it Tuple do
         assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Tuple(Int32, Int32, Int32), "[1,2,3]", {1, 2, 3}
         assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, Tuple(Int32, Int32, Int32)?, "[1,2,3]", {1, 2, 3}
+      end
+
+      it NamedTuple do
+        assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, NamedTuple(numbers: Array(Int32), data: Hash(String, String | Int32)), %({"numbers":[1,2,3],"data":{"name":"Jim","age":19}}), {numbers: [1, 2, 3], data: {"name" => "Jim", "age" => 19}}
+        assert_deserialized_output ASR::Visitors::JSONDeserializationVisitor, NamedTuple(numbers: Array(Int32), data: Hash(String, String | Int32))?, %({"numbers":[1,2,3],"data":{"name":"Jim","age":19}}), {numbers: [1, 2, 3], data: {"name" => "Jim", "age" => 19}}
       end
 
       it TestEnum do

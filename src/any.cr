@@ -13,53 +13,39 @@ module Athena::Serializer::Any
   abstract def as_s? : String?
   abstract def as_a
   abstract def as_a?
-  abstract def as_h
-  abstract def as_h?
+  abstract def as_hash : Hash(Athena::Serializer::Any, Athena::Serializer::Any)
+  abstract def as_hash? : Hash(Athena::Serializer::Any, Athena::Serializer::Any)?
+  abstract def is_nil? : Bool
 end
 
 struct JSON::Any
   include Athena::Serializer::Any
+
+  def is_nil? : Bool
+    @raw.is_a? Nil
+  end
+
+  def as_hash : Hash(Any, Any)
+    self.as_h.transform_keys { |k| self.class.new k }
+  end
+
+  def as_hash? : Hash(Any, Any)?
+    self.as_hash if @raw.is_a? Hash
+  end
 end
 
 struct YAML::Any
   include Athena::Serializer::Any
-end
 
-# :nodoc:
-def Union.new(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any?)
-  {% begin %}
-    # Try to parse the value as a primitive type first
-    # as its faster than trying to parse a non-primitive type
-    {% for type in T %}
-      {% if type == Nil %}
-        return nil if data.nil?
-      {% elsif type < Int %}
-        if value = data.as_i?
-          return {{type}}.new! value
-        end
-      {% elsif type < Float %}
-        if value = data.as_f?
-          return {{type}}.new! value
-        end
-      {% elsif type == Bool || type == String %}
-        value = data.raw.as? {{type}}
-        return value unless value.nil?
-      {% end %}
-    {% end %}
-  {% end %}
+  def is_nil? : Bool
+    @raw.is_a? Nil
+  end
 
-  # Lastly, try to parse a non-primitive type if there are more than 1.
-  {% for type in T %}
-    {% if type == Nil %}
-      return nil if data.nil?
-    {% else %}
-      begin
-        return visitor.visit {{type}}, data
-      rescue
-        # Ignore
-      end
-    {% end %}
-  {% end %}
+  def as_hash : Hash(Any, Any)
+    self.as_h
+  end
 
-  raise "Couldn't parse #{self} from '#{data}'."
+  def as_hash? : Hash(Any, Any)?
+    self.as_h?
+  end
 end
