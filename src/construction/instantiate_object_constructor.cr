@@ -4,6 +4,6 @@ struct Athena::Serializer::InstantiateObjectConstructor
   include Athena::Serializer::ObjectConstructorInterface
 
   def construct(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(PropertyMetadataBase), data : ASR::Any, type)
-    type.new navigator.as(ASR::Navigators::DeserializationNavigator), properties, data
+    type.deserialize navigator.as(ASR::Navigators::DeserializationNavigator), properties, data
   end
 end

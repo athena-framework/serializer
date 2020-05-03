@@ -28,26 +28,27 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
     object
   end
 
-  def accept(type : String?.class | Number?.class | Bool?.class, data : ASR::Any)
-    @visitor.visit type, data
-  end
+  # def accept(type : String?.class | Number?.class | Bool?.class, data : ASR::Any)
+  #   @visitor.visit type, data
+  # end
 
-  def accept(type : NamedTuple?.class | Hash?.class, data : ASR::Any)
-    @visitor.visit type, data
-  end
+  # def accept(type : NamedTuple?.class | Hash?.class, data : ASR::Any)
+  #   @visitor.visit type, data
+  # end
 
-  def accept(type : Array?.class | Tuple?.class | Set?.class, data : ASR::Any)
-    @visitor.visit type, data
-  end
+  # def accept(type : Enumerable?.class, data : ASR::Any)
+  #   @visitor.visit type, data
+  # end
 
-  def accept(type : Enum?.class, data : ASR::Any)
-    @visitor.visit type, data
-  end
+  # def accept(type : Enum?.class, data : ASR::Any)
+  #   @visitor.visit type, data
+  # end
 
-  def accept(type : Union?.class, data : ASR::Any)
-    @visitor.visit type, data
-  end
-
-  def accept(type : _, data : ASR::Any)
+  def accept(type : T, data : ASR::Any) forall T
+    {% if T.has_method? :deserialize %}
+      @visitor.visit type, data
+    {% else %}
+      {% raise "Cannot deserialize '#{T}'" %}
+    {% end %}
   end
 end

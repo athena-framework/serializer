@@ -13,8 +13,6 @@ module Athena::Serializer::Any
   abstract def as_s? : String?
   abstract def as_a
   abstract def as_a?
-  abstract def as_hash
-  abstract def as_hash?
   abstract def is_nil? : Bool
 end
 
@@ -24,14 +22,6 @@ struct JSON::Any
   def is_nil? : Bool
     @raw.is_a? Nil
   end
-
-  def as_hash : Hash(Any, Any)
-    self.as_h.transform_keys { |k| self.class.new k }
-  end
-
-  def as_hash? : Hash(Any, Any)?
-    self.as_hash if @raw.is_a? Hash
-  end
 end
 
 struct YAML::Any
@@ -39,13 +29,5 @@ struct YAML::Any
 
   def is_nil? : Bool
     @raw.is_a? Nil
-  end
-
-  def as_hash : Hash(Any, Any)
-    self.as_h
-  end
-
-  def as_hash? : Hash(Any, Any)?
-    self.as_h?
   end
 end

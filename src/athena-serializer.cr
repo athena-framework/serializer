@@ -154,8 +154,11 @@ module Athena::Serializer
         end
 
         # :nodoc:
-        def apply(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
-          self.initialize navigator, properties, data
+        def self.deserialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
+          instance = allocate
+          instance.initialize navigator, properties, data
+          GC.add_finalizer(instance) if instance.responds_to?(:finalize)
+          instance
         end
 
         def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
