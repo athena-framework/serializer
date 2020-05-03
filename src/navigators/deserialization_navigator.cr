@@ -47,8 +47,6 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
   def accept(type : T, data : ASR::Any) forall T
     {% if T.has_method? :deserialize %}
       @visitor.visit type, data
-    {% else %}
-      {% raise "Cannot deserialize '#{T}'" %}
     {% end %}
   end
 end

@@ -57,10 +57,8 @@ end
 
 def Array.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
   ary = new
-  data.as_a.each do |element|
-    if T.responds_to? :deserialize
-      ary << visitor.navigator.accept(T, element)
-    end
+  data.as_a.each do |item|
+    ary << visitor.navigator.accept(T, item)
   end
   ary
 end
