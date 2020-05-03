@@ -13,8 +13,8 @@ module Athena::Serializer::Any
   abstract def as_s? : String?
   abstract def as_a
   abstract def as_a?
-  abstract def as_hash : Hash(Athena::Serializer::Any, Athena::Serializer::Any)
-  abstract def as_hash? : Hash(Athena::Serializer::Any, Athena::Serializer::Any)?
+  abstract def as_hash
+  abstract def as_hash?
   abstract def is_nil? : Bool
 end
 

@@ -136,7 +136,7 @@ def NamedTuple.new(visitor : ASR::Visitors::DeserializationVisitorInterface, dat
 end
 
 # :nodoc:
-def Union.new(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any?)
+def Union.new(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
   {% begin %}
 
     # Try to parse the value as a primitive type first
