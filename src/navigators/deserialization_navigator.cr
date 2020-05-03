@@ -1,8 +1,5 @@
 module Athena::Serializer::Navigators::DeserializationNavigatorInterface
-  abstract def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext)
-
   abstract def accept(type : ASR::Serializable.class, data : ASR::Any)
-  abstract def accept(type : Number?.class, data : ASR::Any)
   abstract def accept(type : _, data : ASR::Any)
 end
 
@@ -27,22 +24,6 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
 
     object
   end
-
-  # def accept(type : String?.class | Number?.class | Bool?.class, data : ASR::Any)
-  #   @visitor.visit type, data
-  # end
-
-  # def accept(type : NamedTuple?.class | Hash?.class, data : ASR::Any)
-  #   @visitor.visit type, data
-  # end
-
-  # def accept(type : Enumerable?.class, data : ASR::Any)
-  #   @visitor.visit type, data
-  # end
-
-  # def accept(type : Enum?.class, data : ASR::Any)
-  #   @visitor.visit type, data
-  # end
 
   def accept(type : T, data : ASR::Any) forall T
     {% if T.has_method? :deserialize %}

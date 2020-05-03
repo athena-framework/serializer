@@ -58,7 +58,13 @@ end
 def Array.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
   ary = new
   data.as_a.each do |item|
-    ary << visitor.navigator.accept(T, item)
+    value = visitor.navigator.accept(T, item)
+
+    {% if T.nilable? %}
+      ary << value
+    {% else %}
+      value.try { |v| ary << v }
+    {% end %}
   end
   ary
 end
@@ -126,7 +132,7 @@ def Union.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, 
       return nil if data.is_nil?
     {% else %}
       begin
-        return visitor.visit {{type}}, data
+        return visitor.navigator.accept {{type}}, data
       rescue ex
         # Ignore
       end
