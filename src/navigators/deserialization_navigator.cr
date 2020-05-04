@@ -12,7 +12,7 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
 
   def accept(type : T.class, data : ASR::Any) forall T
     {% unless T.instance <= ASR::Serializable %}
-      {% if T.has_method? :deserialize %}
+      {% if T.class.has_method? :deserialize %}
         @visitor.visit type, data
       {% end %}
     {% else %}

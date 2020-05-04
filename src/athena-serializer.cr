@@ -74,8 +74,13 @@ module Athena::Serializer
             {%
               instance_vars = @type.instance_vars
                 .reject { |ivar| ivar.annotation(ASR::Skip) }
-                .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }  # ExclusionPolicy:ALL && ivar not Exposed
-                .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) } # ExclusionPolicy:NONE && ivar is Excluded
+                .reject { |ivar| ivar.annotation(ASR::IgnoreOnSerialize) }
+                .reject do |ivar|
+                  not_exposed = (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose)
+                  excluded = (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude)
+
+                  !ivar.annotation(ASR::IgnoreOnDeserialize) && (not_exposed || excluded)
+                end
             %}
 
             {% property_hash = {} of Nil => Nil %}
@@ -133,11 +138,13 @@ module Athena::Serializer
               {% instance_vars = @type.instance_vars
                    .reject { |ivar| ivar.annotation(ASR::Skip) }
                    .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
-                   # ExclusionPolicy:ALL && ivar not Exposed
-                   .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose) }
-                   # ExclusionPolicy:NONE && ivar is Excluded
-                   .reject { |ivar| (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude) }
-                   .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) } %}
+                   .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) }
+                   .reject do |ivar|
+                     not_exposed = (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose)
+                     excluded = (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASR::Exclude)
+
+                     !ivar.annotation(ASR::IgnoreOnSerialize) && (not_exposed || excluded)
+                   end %}
 
               {{instance_vars.map do |ivar|
                   %(ASR::PropertyMetadata(#{ivar.type}?, #{@type}).new(
@@ -187,3 +194,20 @@ module Athena::Serializer
     end
   end
 end
+
+@[ASR::ExclusionPolicy(:all)]
+class User
+  include ASR::Serializable
+
+  @[ASR::Expose]
+  property first_name : String
+
+  @[ASR::IgnoreOnSerialize]
+  property password : String
+end
+
+serializer = ASR::Serializer.new
+
+user = serializer.deserialize User, %({"first_name":"George","password":"PASS"}), :json
+
+puts serializer.serialize user, :json
