@@ -22,14 +22,14 @@ module Athena::Serializer
     YAML
 
     # Returns the `ASR::SerializationVisitorInterface` to use with `self`.
-    def serialization_visitor # : ASR::Visitors::SerializationVisitorInterface.class
+    def serialization_visitor
       case self
       when .json? then ASR::Visitors::JSONSerializationVisitor
       when .yaml? then ASR::Visitors::YAMLSerializationVisitor
       end
     end
 
-    def deserialization_visitor # : ASR::Visitors::DeserializationVisitorInterface.class
+    def deserialization_visitor
       case self
       when .json? then ASR::Visitors::JSONDeserializationVisitor
       when .yaml? then ASR::Visitors::YAMLDeserializationVisitor
