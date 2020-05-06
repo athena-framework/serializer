@@ -169,6 +169,11 @@ module Athena::Serializer
         end
 
         # :nodoc:
+        def apply(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
+          self.initialize navigator, properties, data
+        end
+
+        # :nodoc:
         def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
           {% begin %}
             {% for ivar, idx in @type.instance_vars %}

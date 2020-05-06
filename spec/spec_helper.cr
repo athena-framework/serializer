@@ -34,11 +34,23 @@ class TestObject
   getter nest : NestedType = NestedType.new
 end
 
+private def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
+  [ASR::PropertyMetadata(String, TestObject).new(
+    name: "name",
+    external_name: "external_name",
+    value: "YES",
+    skip_when_empty: false,
+    groups: ["default"],
+    since_version: nil,
+    until_version: nil,
+  )] of ASR::PropertyMetadataBase
+end
+
+# Test implementation of `ASR::Visitors::SerializationVisitorInterface` that writes the data to the `io`.
 class TestSerializationVisitor
   include Athena::Serializer::Visitors::SerializationVisitorInterface
 
-  def initialize(@io : IO, named_args : NamedTuple) : Nil
-  end
+  def initialize(@io : IO, named_args : NamedTuple); end
 
   def assert_properties(handler : Proc(Array(ASR::PropertyMetadataBase), Nil)) : Nil
     @assert_properties = handler
@@ -59,11 +71,17 @@ class TestSerializationVisitor
   end
 end
 
+def create_serialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> Nil)
+  visitor = TestSerializationVisitor.new IO::Memory.new, NamedTuple.new
+  visitor.assert_properties block
+  visitor
+end
+
+# Test implementation of `ASR::Visitors::DeserializationVisitorInterface` that writes the data to the `io`.
 class TestDeserializationVisitor
   include Athena::Serializer::Visitors::DeserializationVisitorInterface
 
-  def initialize(@io : IO) : Nil
-  end
+  def initialize(@io : IO); end
 
   def assert_properties(handler : Proc(Array(ASR::PropertyMetadataBase), ASR::Serializable)) : Nil
     @assert_properties = handler
@@ -85,83 +103,22 @@ class TestDeserializationVisitor
   end
 end
 
-private struct TestSerializationNavigator
-  include Athena::Serializer::Navigators::SerializationNavigatorInterface
-
-  def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
-
-  def accept(data : ASR::Serializable) : Nil
-    @visitor.visit data.serialization_properties
-  end
-
-  def accept(data : _) : Nil
-    @visitor.visit data
-  end
-end
-
-private struct TestDeserializationNavigator
-  include Athena::Serializer::Navigators::DeserializationNavigatorInterface
-
-  def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext); end
-
-  def accept(type : ASR::Serializable.class, data : ASR::Any) : ASR::Serializable
-    @visitor.visit type, type.deserialization_properties, data
-  end
-
-  def accept(type : _, data : ASR::Any)
-    @visitor.visit data
-  end
-end
-
-def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
-  [ASR::PropertyMetadata(String, TestObject).new(
-    name: "name",
-    external_name: "external_name",
-    value: "YES",
-    skip_when_empty: false,
-    groups: ["default"],
-    since_version: nil,
-    until_version: nil,
-  )] of ASR::PropertyMetadataBase
-end
-
-def create_serialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> Nil)
-  visitor = TestSerializationVisitor.new IO::Memory.new, NamedTuple.new
-  visitor.assert_properties block
-  visitor
-end
-
 def create_deserialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> ASR::Serializable)
   visitor = TestDeserializationVisitor.new IO::Memory.new
   visitor.assert_properties block
   visitor
 end
 
-def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisitorInterface.class, type : _, data : _, expected : _)
-  visitor = visitor_type.new
-  navigator = TestDeserializationNavigator.new(visitor, ASR::DeserializationContext.new)
-  visitor.navigator = navigator
+struct TestObjectConstructor(T)
+  include Athena::Serializer::ObjectConstructorInterface
 
-  result = visitor.visit(type, visitor.prepare(data))
-  result.should eq expected
-  typeof(result).should eq type
-end
+  def initialize(@expected_type : T); end
 
-# Asserts the output of the given *visitor_type*.
-def assert_serialized_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.class, expected : String, **named_args, & : ASR::Visitors::SerializationVisitorInterface -> Nil)
-  io = IO::Memory.new
+  def construct(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any, type)
+    type.should eq @expected_type
 
-  visitor = visitor_type.new io, named_args
-  navigator = TestSerializationNavigator.new(visitor, ASR::SerializationContext.new)
-  visitor.navigator = navigator
-
-  visitor.prepare
-
-  yield visitor
-
-  visitor.finish
-
-  io.rewind.gets_to_end.should eq expected
+    EmptyObject.new
+  end
 end
 
 def create_metadata(*, name : String = "name", external_name : String = "external_name", value : I = "value", skip_when_empty : Bool = false, groups : Array(String) = ["default"], since_version : String? = nil, until_version : String? = nil) : ASR::PropertyMetadata forall I

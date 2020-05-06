@@ -181,7 +181,7 @@ describe ASR::Serializable do
       end
     end
 
-    pending ASR::IgnoreOnSerialize do
+    describe ASR::IgnoreOnSerialize do
       it "should not include ignored properties" do
         properties = IgnoreOnSerialize.new.serialization_properties
         properties.size.should eq 1

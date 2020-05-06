@@ -6,9 +6,11 @@ end
 struct Athena::Serializer::Navigators::DeserializationNavigator
   include Athena::Serializer::Navigators::DeserializationNavigatorInterface
 
-  @object_constructor : ASR::ObjectConstructorInterface = ASR::InstantiateObjectConstructor.new
-
-  def initialize(@visitor : ASR::Visitors::DeserializationVisitorInterface, @context : ASR::DeserializationContext); end
+  def initialize(
+    @visitor : ASR::Visitors::DeserializationVisitorInterface,
+    @context : ASR::DeserializationContext,
+    @object_constructor : ASR::ObjectConstructorInterface = ASR::InstantiateObjectConstructor.new
+  ); end
 
   def accept(type : T.class, data : ASR::Any) forall T
     {% unless T.instance <= ASR::Serializable %}
@@ -23,10 +25,10 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
               when {{k}} then {{t}}
             {% end %}
           else
-            raise "Unknown key"
+            raise "Unknown '#{{{ann[:key]}}}' discriminator value: '#{key}'."
           end
         else
-          raise "Missing discriminator key"
+          raise "Missing discriminator field '#{{{ann[:key]}}}'."
         end
       {% end %}
 

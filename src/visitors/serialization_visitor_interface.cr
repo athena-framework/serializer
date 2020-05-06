@@ -1,6 +1,4 @@
 module Athena::Serializer::Visitors::SerializationVisitorInterface
-  abstract def initialize(io : IO, named_arguments : NamedTuple) : Nil
-
   abstract def prepare : Nil
   abstract def finish : Nil
 

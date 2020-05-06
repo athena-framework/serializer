@@ -35,6 +35,9 @@ struct Athena::Serializer::Serializer
     visitor.finish
   end
 
+  # Returns the `ASR::Visitors::DeserializationVisitorInterface.class` for the given *format*.
+  #
+  # Can be redefined in order to allow resolving custom formats.
   protected def get_deserialization_visitor_class(format : ASR::Format | String)
     if format.is_a? ASR::Format
       return format.deserialization_visitor
@@ -43,6 +46,9 @@ struct Athena::Serializer::Serializer
     ASR::Format.parse(format).deserialization_visitor
   end
 
+  # Returns the `ASR::Visitors::SerializationVisitorInterface.class` for the given *format*.
+  #
+  # Can be redefined in order to allow resolving custom formats.
   protected def get_serialization_visitor(format : ASR::Format | String)
     if format.is_a? ASR::Format
       return format.serialization_visitor
