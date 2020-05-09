@@ -6,21 +6,15 @@ abstract class Athena::Serializer::Visitors::DeserializationVisitor
 
   property! navigator : Athena::Serializer::Navigators::DeserializationNavigatorInterface
 
-  # def visit(type : String.class, data : String) : String
-  #   data
-  # end
-
-  # def visit(type : Number.class, data : String)
-  #   type.new data
-  # end
-
   def visit(type : Nil.class, data : ASR::Any) : Nil
   end
 
-  macro finished
-    def visit(type : _, data : ASR::Any)
-      type.deserialize self, data
-    end
+  def visit(type : _, data : ASR::Any)
+    type.deserialize self, data
+  end
+
+  def visit(type : _, data : _)
+    data
   end
 end
 
@@ -55,18 +49,64 @@ def String.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface,
   data.as_s
 end
 
+# :nodoc:
 def Array.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
-  ary = new
+  collection = new
   data.as_a.each do |item|
     value = visitor.navigator.accept(T, item)
 
     {% if T.nilable? %}
-      ary << value
+      collection << value
     {% else %}
-      value.try { |v| ary << v }
+      value.try { |v| collection << v }
     {% end %}
   end
-  ary
+  collection
+end
+
+# :nodoc:
+def Set.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
+  collection = new
+  data.as_a.each do |item|
+    value = visitor.navigator.accept(T, item)
+
+    {% if T.nilable? %}
+      collection << value
+    {% else %}
+      value.try { |v| collection << v }
+    {% end %}
+  end
+  collection
+end
+
+# :nodoc:
+def Deque.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
+  collection = new
+  data.as_a.each do |item|
+    value = visitor.navigator.accept(T, item)
+
+    {% if T.nilable? %}
+      collection << value
+    {% else %}
+      value.try { |v| collection << v }
+    {% end %}
+  end
+  collection
+end
+
+# :nodoc:
+def Hash.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
+  hash = new
+  data.as_h.each do |key, value|
+    value = visitor.navigator.accept(V, value)
+
+    {% if T.nilable? %}
+      hash[visitor.visit(K, key)] = value
+    {% else %}
+      value.try { |v| hash[visitor.visit(K, key)] = v }
+    {% end %}
+  end
+  hash
 end
 
 # :nodoc:
@@ -100,6 +140,17 @@ def NamedTuple.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterf
       {% end %}
     }
   {% end %}
+end
+
+# :nodoc:
+def Enum.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
+  if val = data.as_i64?
+    from_value val
+  elsif val = data.as_s?
+    parse val
+  else
+    raise "Couldn't parse #{self} from '#{data}'."
+  end
 end
 
 # :nodoc:

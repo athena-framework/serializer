@@ -34,7 +34,7 @@ class TestObject
   getter nest : NestedType = NestedType.new
 end
 
-private def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
+def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
   [ASR::PropertyMetadata(String, TestObject).new(
     name: "name",
     external_name: "external_name",
@@ -44,6 +44,37 @@ private def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
     since_version: nil,
     until_version: nil,
   )] of ASR::PropertyMetadataBase
+end
+
+private struct TestSerializationNavigator
+  include Athena::Serializer::Navigators::SerializationNavigatorInterface
+
+  def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
+
+  def accept(data : ASR::Serializable) : Nil
+    @visitor.visit data.serialization_properties
+  end
+
+  def accept(data : _) : Nil
+    @visitor.visit data
+  end
+end
+
+# Asserts the output of the given *visitor_type*.
+def assert_serialized_output(visitor_type : ASR::Visitors::SerializationVisitorInterface.class, expected : String, **named_args, & : ASR::Visitors::SerializationVisitorInterface -> Nil)
+  io = IO::Memory.new
+
+  visitor = visitor_type.new io, named_args
+  navigator = TestSerializationNavigator.new(visitor, ASR::SerializationContext.new)
+  visitor.navigator = navigator
+
+  visitor.prepare
+
+  yield visitor
+
+  visitor.finish
+
+  io.rewind.gets_to_end.should eq expected
 end
 
 # Test implementation of `ASR::Visitors::SerializationVisitorInterface` that writes the data to the `io`.
@@ -109,6 +140,22 @@ def create_deserialization_visitor(&block : Array(ASR::PropertyMetadataBase) -> 
   visitor
 end
 
+def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisitorInterface.class, type : _, data : _, expected : _)
+  context = ASR::DeserializationContext.new
+  context.init
+
+  visitor = visitor_type.new
+  navigator = ASR::Navigators::DeserializationNavigator.new visitor, context
+
+  visitor.navigator = navigator
+
+  result = navigator.accept type, visitor.prepare data
+  result.should eq expected
+end
+
+# Test implementation of `ASR::ObjectConstructorInterface`.
+#
+# Asserts *type* equals the expected type.
 struct TestObjectConstructor(T)
   include Athena::Serializer::ObjectConstructorInterface
 
