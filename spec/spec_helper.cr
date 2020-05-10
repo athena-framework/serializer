@@ -10,30 +10,6 @@ enum TestEnum
   Three
 end
 
-class EmptyObject
-  include ASR::Serializable
-
-  def initialize; end
-end
-
-class NestedType
-  include ASR::Serializable
-
-  def initialize; end
-
-  getter active : Bool = true
-end
-
-class TestObject
-  include ASR::Serializable
-
-  def initialize; end
-
-  getter foo : Symbol = :foo
-  getter bar : Float32 = 12.1_f32
-  getter nest : NestedType = NestedType.new
-end
-
 def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
   [ASR::PropertyMetadata(String, TestObject).new(
     name: "name",

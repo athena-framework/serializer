@@ -68,7 +68,7 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor
     end
   end
 
-  def visit(data : JSON::Any | YAML::Any) : Nil
+  def visit(data : ASR::Any) : Nil
     visit data.raw
   end
 
@@ -82,5 +82,10 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor
 
   def visit(data : UUID) : Nil
     visit data.to_s
+  end
+
+  def visit(data : _) : Nil
+    # Set non serializable types to null
+    @builder.null
   end
 end

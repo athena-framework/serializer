@@ -67,4 +67,9 @@ class Athena::Serializer::Visitors::YAMLSerializationVisitor
   def visit(data : UUID) : Nil
     visit data.to_s
   end
+
+  def visit(data : _) : Nil
+    # Set non serializable types to null
+    @builder.scalar nil
+  end
 end

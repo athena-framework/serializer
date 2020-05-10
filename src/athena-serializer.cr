@@ -91,7 +91,7 @@ module Athena::Serializer
               {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{@type}).new(
                   name: #{ivar.name.stringify},
                   external_name: #{external_name},
-                  value: #{(accessor = ivar.annotation(ASR::Accessor)) && accessor[:getter] != nil ? accessor[:getter].id : ivar.id},
+                  value: #{(accessor = ivar.annotation(ASR::Accessor)) && accessor[:getter] != nil ? accessor[:getter].id : %(@#{ivar.id}).id},
                   skip_when_empty: #{!!ivar.annotation(ASR::SkipWhenEmpty)},
                   groups: #{(ann = ivar.annotation(ASR::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
                   since_version: #{(ann = ivar.annotation(ASR::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
@@ -101,7 +101,7 @@ module Athena::Serializer
 
             {% for m in @type.methods.select { |method| method.annotation(ASR::VirtualProperty) } %}
               {% method_name = m.name %}
-              {% raise "VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
+              {% m.raise "VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
               {% external_name = (ann = m.annotation(ASR::Name)) && (name = ann[:serialize]) ? name : m.name.stringify %}
 
               {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{@type}).new(
@@ -116,10 +116,10 @@ module Athena::Serializer
               {% if ann[0] == :alphabetical %}
                 {% properties = property_hash.keys.sort.map { |key| property_hash[key] } %}
               {% elsif ann[0] == :custom && !ann[:order].nil? %}
-                {% raise "Not all properties were defined in the custom order for '#{@type}'" unless property_hash.keys.all? { |prop| ann[:order].map(&.id.stringify).includes? prop } %}
+                {% ann.raise "Not all properties were defined in the custom order for '#{@type}'" unless property_hash.keys.all? { |prop| ann[:order].map(&.id.stringify).includes? prop } %}
                 {% properties = ann[:order].map { |val| property_hash[val.id.stringify] || raise "Unknown instance variable: '#{val.id}'" } %}
               {% else %}
-                {% raise "Invalid ASR::AccessorOrder value: '#{ann[0].id}'" %}
+                {% ann.raise "Invalid ASR::AccessorOrder value: '#{ann[0].id}'" %}
               {% end %}
             {% else %}
               {% properties = property_hash.values %}
@@ -137,7 +137,7 @@ module Athena::Serializer
               # Takes into consideration some annotations to control how/when a property should be serialized
               {% instance_vars = @type.instance_vars
                    .reject { |ivar| ivar.annotation(ASR::Skip) }
-                   .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
+                   .reject { |ivar| (ann = ivar.annotation(ASR::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? ivar.raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
                    .reject { |ivar| ivar.annotation(ASR::IgnoreOnDeserialize) }
                    .reject do |ivar|
                      not_exposed = (ann = @type.annotation(ASR::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASR::Expose)
@@ -184,14 +184,18 @@ module Athena::Serializer
                   @{{ivar.id}} = value
                 else
                   {% if !ivar.type.nilable? && !ivar.has_default_value? %}
-                    raise Exception.new "Required property '{{ivar}}' cannot be nil"
+                    raise Exception.new "Required property '{{ivar}}' cannot be nil."
                   {% end %}
                 end
               else
                 {% if !ivar.type.nilable? && !ivar.has_default_value? %}
-                  raise Exception.new "Missing required attribute: '{{ivar}}'"
+                  raise Exception.new "Missing required attribute: '{{ivar}}'."
                 {% end %}
               end
+
+              {% if (ann = ivar.annotation(ASR::Accessor)) && (setter = ann[:setter]) %}
+                self.{{setter.id}}(@{{ivar.id}})
+              {% end %}
             {% end %}
           {% end %}
         end
@@ -199,20 +203,3 @@ module Athena::Serializer
     end
   end
 end
-
-@[ASR::ExclusionPolicy(:all)]
-class User
-  include ASR::Serializable
-
-  @[ASR::Expose]
-  property first_name : String
-
-  @[ASR::IgnoreOnSerialize]
-  property password : String
-end
-
-serializer = ASR::Serializer.new
-
-user = serializer.deserialize User, %({"first_name":"George","password":"PASS"}), :json
-
-puts serializer.serialize user, :json

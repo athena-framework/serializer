@@ -14,6 +14,8 @@ module Athena::Serializer::Any
   abstract def as_a
   abstract def as_a?
   abstract def is_nil? : Bool
+
+  abstract def raw
 end
 
 struct JSON::Any

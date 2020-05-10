@@ -40,14 +40,11 @@ end
   {% for type, method in primitives %}
     def {{type}}.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
       data{{method.id}}
+    rescue ex : TypeCastError
+      raise "Could not parse {{type}} from '#{data.inspect}'."
     end
   {% end %}
 {% end %}
-
-# :nodoc:
-def String.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
-  data.as_s
-end
 
 # :nodoc:
 def Array.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
