@@ -129,21 +129,6 @@ def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisi
   result.should eq expected
 end
 
-# Test implementation of `ASR::ObjectConstructorInterface`.
-#
-# Asserts *type* equals the expected type.
-struct TestObjectConstructor(T)
-  include Athena::Serializer::ObjectConstructorInterface
-
-  def initialize(@expected_type : T); end
-
-  def construct(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any, type)
-    type.should eq @expected_type
-
-    EmptyObject.new
-  end
-end
-
 def create_metadata(*, name : String = "name", external_name : String = "external_name", value : I = "value", skip_when_empty : Bool = false, groups : Array(String) = ["default"], since_version : String? = nil, until_version : String? = nil) : ASR::PropertyMetadata forall I
   context = ASR::PropertyMetadata(I, EmptyObject).new name, external_name, value, skip_when_empty, groups
 

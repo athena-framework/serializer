@@ -4,7 +4,7 @@ describe ASR::Serializable do
   describe "#serialization_properties" do
     describe ASR::Accessor do
       it "should use the value of the method" do
-        properties = Accessor.new.serialization_properties
+        properties = GetterAccessor.new.serialization_properties
         properties.size.should eq 1
 
         p = properties[0]
@@ -14,7 +14,7 @@ describe ASR::Serializable do
         p.value.should eq "FOO"
         p.skip_when_empty?.should be_false
         p.type.should eq String
-        p.class.should eq Accessor
+        p.class.should eq GetterAccessor
       end
     end
 
