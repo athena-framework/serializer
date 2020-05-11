@@ -4,7 +4,7 @@ module Athena::Serializer::PropertyMetadataBase
   include Athena::Serializer::Metadata
 end
 
-struct Athena::Serializer::PropertyMetadata(IvarType, ClassType)
+struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   include Athena::Serializer::PropertyMetadataBase
 
   # The name of the property.
@@ -14,7 +14,7 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ClassType)
   getter external_name : String
 
   # The value of the property.
-  getter value : IvarType
+  getter value : ValueType
 
   # The type of the property.
   getter type : IvarType.class = IvarType
@@ -50,7 +50,7 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ClassType)
   def initialize(
     @name : String,
     @external_name : String,
-    @value : IvarType = nil,
+    @value : ValueType = nil,
     @skip_when_empty : Bool = false,
     @groups : Array(String) = ["default"],
     @aliases : Array(String) = [] of String,

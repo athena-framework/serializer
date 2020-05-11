@@ -88,7 +88,7 @@ module Athena::Serializer
             {% for ivar in instance_vars %}
               {% external_name = (ann = ivar.annotation(ASR::Name)) && (name = ann[:serialize]) ? name : ivar.name.stringify %}
 
-              {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{@type}).new(
+              {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}, #{@type}).new(
                   name: #{ivar.name.stringify},
                   external_name: #{external_name},
                   value: #{(accessor = ivar.annotation(ASR::Accessor)) && accessor[:getter] != nil ? accessor[:getter].id : %(@#{ivar.id}).id},
@@ -104,7 +104,7 @@ module Athena::Serializer
               {% m.raise "VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
               {% external_name = (ann = m.annotation(ASR::Name)) && (name = ann[:serialize]) ? name : m.name.stringify %}
 
-              {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{@type}).new(
+              {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{m.return_type}, #{@type}).new(
                   name: #{m.name.stringify},
                   external_name: #{external_name},
                   value: #{m.name.id},
@@ -147,7 +147,7 @@ module Athena::Serializer
                    end %}
 
               {{instance_vars.map do |ivar|
-                  %(ASR::PropertyMetadata(#{ivar.type}?, #{@type}).new(
+                  %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
                     name: #{ivar.name.stringify},
                     external_name: #{(ann = ivar.annotation(ASR::Name)) && (name = ann[:deserialize]) ? name : ivar.name.stringify},
                     aliases: #{(ann = ivar.annotation(ASR::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
@@ -174,11 +174,15 @@ module Athena::Serializer
         end
 
         # :nodoc:
-        def initialize(navigator : ASR::Navigators::DeserializationNavigator, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
+        def initialize(navigator : ASR::Navigators::DeserializationNavigatorInterface, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
           {% begin %}
             {% for ivar, idx in @type.instance_vars %}
               if (prop = properties.find { |p| p.name == {{ivar.name.stringify}} }) && ((val = data[prop.external_name]?) || ((key = prop.aliases.find { |a| data[a]? }) && (val = data[key]?)))
-                value = navigator.accept {{ivar.type}}, val
+                value = {% if (ann = ivar.annotation(ASR::Accessor)) && (converter = ann[:converter]) %}
+                          {{converter.id}}.deserialize navigator, prop, val
+                        {% else %}
+                          navigator.accept {{ivar.type}}, val
+                        {% end %}
 
                 unless value.nil?
                   @{{ivar.id}} = value
