@@ -44,6 +44,19 @@ class TestingModel
   end
 end
 
+module ReverseConverter
+  def self.deserialize(navigator : ASR::Navigators::DeserializationNavigatorInterface, metadata : ASR::PropertyMetadataBase, data : ASR::Any) : String
+    data.as_s.reverse
+  end
+end
+
+class ReverseConverterModel
+  include ASR::Serializable
+
+  @[ASR::Accessor(converter: ReverseConverter)]
+  getter str : String
+end
+
 describe ASR::Serializer do
   describe "#deserialize" do
     describe ASR::Serializable do
@@ -120,6 +133,12 @@ describe ASR::Serializer do
           array[1].id.should eq 3
 
           obj.obj.id.should eq 4
+        end
+      end
+
+      describe ReverseConverterModel do
+        it "should use the converter when deserializing" do
+          ASR::Serializer.new.deserialize(ReverseConverterModel, %({"str":"jim"}), :json).str.should eq "mij"
         end
       end
     end
