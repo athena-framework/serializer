@@ -14,7 +14,7 @@ description: |
   Object (de)serialization library.
 
 authors:
-  - Blacksmoke16 <blacksmoke16@eve.tools>
+  - George Dietrich <george@dietrich.app>
 
 development_dependencies:
   ameba:
