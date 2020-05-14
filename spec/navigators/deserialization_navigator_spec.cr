@@ -2,7 +2,7 @@ require "../spec_helper"
 
 describe ASR::Navigators::DeserializationNavigator do
   describe "#accept" do
-    describe ASR::PostDeserialize do
+    describe ASRA::PostDeserialize do
       it "should run post deserilize methods" do
         data = JSON.parse %({"name": "First Last"})
 

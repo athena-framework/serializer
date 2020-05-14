@@ -18,6 +18,7 @@ module Athena::Serializer::Any
   abstract def raw
 end
 
+# :nodoc:
 struct JSON::Any
   include Athena::Serializer::Any
 
@@ -26,6 +27,7 @@ struct JSON::Any
   end
 end
 
+# :nodoc:
 struct YAML::Any
   include Athena::Serializer::Any
 

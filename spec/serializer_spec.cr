@@ -53,7 +53,7 @@ end
 class ReverseConverterModel
   include ASR::Serializable
 
-  @[ASR::Accessor(converter: ReverseConverter)]
+  @[ASRA::Accessor(converter: ReverseConverter)]
   getter str : String
 end
 
@@ -74,13 +74,13 @@ describe ASR::Serializer do
         end
       end
 
-      describe ASR::Accessor do
+      describe ASRA::Accessor do
         it :setter do
           ASR::Serializer.new.deserialize(SetterAccessor, %({"foo":"foo"}), :json).foo.should eq "FOO"
         end
       end
 
-      describe ASR::Discriminator do
+      describe ASRA::Discriminator do
         it "happy path" do
           ASR::Serializer.new.deserialize(Shape, %({"x":1,"y":2,"type":"point"}), :json).should be_a Point
         end

@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe ASR::Serializable do
   describe "#serialization_properties" do
-    describe ASR::Accessor do
+    describe ASRA::Accessor do
       it "should use the value of the method" do
         properties = GetterAccessor.new.serialization_properties
         properties.size.should eq 1
@@ -18,7 +18,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::AccessorOrder do
+    describe ASRA::AccessorOrder do
       describe :default do
         it "should used the order in which the properties were defined" do
           properties = Default.new.serialization_properties
@@ -50,7 +50,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::Skip do
+    describe ASRA::Skip do
       it "should not include skipped properties" do
         properties = Skip.new.serialization_properties
         properties.size.should eq 1
@@ -66,9 +66,9 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::ExclusionPolicy do
+    describe ASRA::ExclusionPolicy do
       describe :all do
-        describe ASR::Expose do
+        describe ASRA::Expose do
           it "should only return properties that are exposed" do
             properties = Expose.new.serialization_properties
             properties.size.should eq 1
@@ -86,7 +86,7 @@ describe ASR::Serializable do
       end
 
       describe :none do
-        describe ASR::Exclude do
+        describe ASRA::Exclude do
           it "should only return properties that are not excluded" do
             properties = Exclude.new.serialization_properties
             properties.size.should eq 1
@@ -104,7 +104,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::Name do
+    describe ASRA::Name do
       describe :serialize do
         it "should use the value in the annotation or property name if it wasnt defined" do
           properties = SerializedName.new.serialization_properties
@@ -140,7 +140,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::SkipWhenEmpty do
+    describe ASRA::SkipWhenEmpty do
       it "should use the value of the method" do
         properties = SkipWhenEmpty.new.serialization_properties
         properties.size.should eq 1
@@ -156,7 +156,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::VirtualProperty do
+    describe ASRA::VirtualProperty do
       it "should only return properties that are not excluded" do
         properties = VirtualProperty.new.serialization_properties
         properties.size.should eq 2
@@ -181,7 +181,7 @@ describe ASR::Serializable do
       end
     end
 
-    describe ASR::IgnoreOnSerialize do
+    describe ASRA::IgnoreOnSerialize do
       it "should not include ignored properties" do
         properties = IgnoreOnSerialize.new.serialization_properties
         properties.size.should eq 1

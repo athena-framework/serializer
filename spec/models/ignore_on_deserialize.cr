@@ -3,6 +3,6 @@ class IgnoreOnDeserialize
 
   property name : String = "Fred"
 
-  @[ASR::IgnoreOnDeserialize]
+  @[ASRA::IgnoreOnDeserialize]
   property password : String = "monkey"
 end

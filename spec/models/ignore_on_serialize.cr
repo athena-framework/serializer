@@ -5,6 +5,6 @@ class IgnoreOnSerialize
 
   property name : String = "Fred"
 
-  @[ASR::IgnoreOnSerialize]
+  @[ASRA::IgnoreOnSerialize]
   property password : String = "monkey"
 end

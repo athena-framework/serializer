@@ -3,6 +3,6 @@
 
 #   property name : String
 
-#   @[ASR::ReadOnly]
+#   @[ASRA::ReadOnly]
 #   property password : String?
 # end

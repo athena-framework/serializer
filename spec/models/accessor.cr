@@ -3,7 +3,7 @@ class GetterAccessor
 
   def initialize; end
 
-  @[ASR::Accessor(getter: get_foo)]
+  @[ASRA::Accessor(getter: get_foo)]
   @foo : String = "foo"
 
   private def get_foo : String
@@ -14,7 +14,7 @@ end
 class SetterAccessor
   include ASR::Serializable
 
-  @[ASR::Accessor(setter: set_foo)]
+  @[ASRA::Accessor(setter: set_foo)]
   getter foo : String
 
   private def set_foo(foo : String) : String

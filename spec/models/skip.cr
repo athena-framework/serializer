@@ -5,6 +5,6 @@ class Skip
 
   property one : String = "one"
 
-  @[ASR::Skip]
+  @[ASRA::Skip]
   property two : String = "two"
 end

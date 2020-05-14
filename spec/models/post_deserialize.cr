@@ -1,4 +1,4 @@
-@[ASR::ExclusionPolicy(:all)]
+@[ASRA::ExclusionPolicy(:all)]
 class PostDeserialize
   include ASR::Serializable
 
@@ -7,10 +7,10 @@ class PostDeserialize
   getter first_name : String?
   getter last_name : String?
 
-  @[ASR::Expose]
+  @[ASRA::Expose]
   getter name : String = "First Last"
 
-  @[ASR::PostDeserialize]
+  @[ASRA::PostDeserialize]
   def split_name : Nil
     @first_name, @last_name = @name.split(' ')
   end

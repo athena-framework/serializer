@@ -1,4 +1,3 @@
-require "json"
 require "./serialization_visitor_interface"
 
 class Athena::Serializer::Visitors::JSONSerializationVisitor

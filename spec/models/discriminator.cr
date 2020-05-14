@@ -1,4 +1,4 @@
-@[ASR::Discriminator(key: "type", map: {"point" => Point, "circle" => Circle})]
+@[ASRA::Discriminator(key: "type", map: {"point" => Point, "circle" => Circle})]
 abstract class Shape
   include ASR::Serializable
 

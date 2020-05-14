@@ -3,10 +3,10 @@ class SerializedName
 
   def initialize; end
 
-  @[ASR::Name(serialize: "myAddress")]
+  @[ASRA::Name(serialize: "myAddress")]
   property my_home_address : String = "123 Fake Street"
 
-  @[ASR::Name(deserialize: "some_key", serialize: "a_value")]
+  @[ASRA::Name(deserialize: "some_key", serialize: "a_value")]
   property value : String = "str"
 
   # ameba:disable Style/VariableNames
@@ -18,7 +18,7 @@ class DeserializedName
 
   def initialize; end
 
-  @[ASR::Name(deserialize: "des")]
+  @[ASRA::Name(deserialize: "des")]
   property custom_name : Int32?
 
   property default_name : Bool?
@@ -29,6 +29,6 @@ class AliasName
 
   def initialize; end
 
-  @[ASR::Name(aliases: ["val", "value", "some_value"])]
+  @[ASRA::Name(aliases: ["val", "value", "some_value"])]
   property some_value : String?
 end

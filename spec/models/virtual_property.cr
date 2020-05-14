@@ -5,7 +5,7 @@ class VirtualProperty
 
   property foo : String = "foo"
 
-  @[ASR::VirtualProperty]
+  @[ASRA::VirtualProperty]
   def get_val : String
     "VAL"
   end

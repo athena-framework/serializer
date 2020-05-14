@@ -1,4 +1,4 @@
-@[ASR::ExclusionPolicy(:none)]
+@[ASRA::ExclusionPolicy(:none)]
 class Exclude
   include ASR::Serializable
 
@@ -6,6 +6,6 @@ class Exclude
 
   property name : String = "Jim"
 
-  @[ASR::Exclude]
+  @[ASRA::Exclude]
   property password : String? = "monkey"
 end

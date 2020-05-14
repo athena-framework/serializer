@@ -3,6 +3,6 @@ class SkipWhenEmpty
 
   def initialize; end
 
-  @[ASR::SkipWhenEmpty]
+  @[ASRA::SkipWhenEmpty]
   property value : String = "value"
 end

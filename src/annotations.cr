@@ -1,4 +1,4 @@
-module Athena::Serializer
+module Athena::Serializer::Annotations
   # Defines the method to use to get/set the property's value.
   #
   # TODO: Implement `setter`.

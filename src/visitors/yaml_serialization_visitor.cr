@@ -1,5 +1,3 @@
-require "yaml"
-
 class Athena::Serializer::Visitors::YAMLSerializationVisitor
   include Athena::Serializer::Visitors::SerializationVisitorInterface
 

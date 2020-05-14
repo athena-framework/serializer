@@ -1,6 +1,6 @@
 module Athena::Serializer::Navigators::DeserializationNavigatorInterface
-  abstract def accept(type : ASR::Serializable.class, data : ASR::Any)
-  abstract def accept(type : T, data : ASR::Any) forall T
+  # abstract def accept(type : ASR::Serializable.class, data : ASR::Any)
+  # abstract def accept(type : T, data : ASR::Any) forall T
 end
 
 struct Athena::Serializer::Navigators::DeserializationNavigator
@@ -18,7 +18,7 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
         @visitor.visit type, data
       {% end %}
     {% else %}
-      {% if ann = T.instance.annotation(ASR::Discriminator) %}
+      {% if ann = T.instance.annotation(ASRA::Discriminator) %}
         if key = data[{{ann[:key]}}]?
           type = case key
             {% for k, t in ann[:map] %}

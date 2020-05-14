@@ -2,7 +2,7 @@ require "../spec_helper"
 
 describe ASR::Navigators::SerializationNavigator do
   describe "#accept" do
-    describe ASR::PreSerialize do
+    describe ASRA::PreSerialize do
       it "should run pre serialize methods" do
         obj = PreSerialize.new
         obj.name.should be_nil
@@ -38,7 +38,7 @@ describe ASR::Navigators::SerializationNavigator do
       end
     end
 
-    describe ASR::PostSerialize do
+    describe ASRA::PostSerialize do
       it "should run pre serialize methods" do
         obj = PostSerialize.new
         obj.name.should be_nil
@@ -74,7 +74,7 @@ describe ASR::Navigators::SerializationNavigator do
       end
     end
 
-    describe ASR::SkipWhenEmpty do
+    describe ASRA::SkipWhenEmpty do
       it "should not serialize empty properties" do
         obj = SkipWhenEmpty.new
         obj.value = ""
@@ -162,7 +162,7 @@ describe ASR::Navigators::SerializationNavigator do
       end
     end
 
-    describe ASR::Groups do
+    describe ASRA::Groups do
       describe "without any groups in the context" do
         it "should include all properties" do
           obj = Group.new
