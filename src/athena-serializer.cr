@@ -21,6 +21,8 @@ alias ASR = Athena::Serializer
 alias ASRA = Athena::Serializer::Annotations
 
 module Athena::Serializer
+  class_getter serializer : ASR::SerializerInterface { ASR::Serializer.new }
+
   enum Format
     JSON
     YAML

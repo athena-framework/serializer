@@ -63,44 +63,44 @@ describe ASR::Serializer do
       describe NotNilableModel do
         it "missing" do
           expect_raises Exception, "Missing required attribute: 'not_nilable'." do
-            ASR::Serializer.new.deserialize NotNilableModel, %({}), :json
+            ASR.serializer.deserialize NotNilableModel, %({}), :json
           end
         end
 
         it nil do
           expect_raises Exception, "Required property 'not_nilable_not_serializable' cannot be nil." do
-            ASR::Serializer.new.deserialize NotNilableModel, %({"not_nilable":"FOO","not_nilable_not_serializable":null}), :json
+            ASR.serializer.deserialize NotNilableModel, %({"not_nilable":"FOO","not_nilable_not_serializable":null}), :json
           end
         end
       end
 
       describe ASRA::Accessor do
         it :setter do
-          ASR::Serializer.new.deserialize(SetterAccessor, %({"foo":"foo"}), :json).foo.should eq "FOO"
+          ASR.serializer.deserialize(SetterAccessor, %({"foo":"foo"}), :json).foo.should eq "FOO"
         end
       end
 
       describe ASRA::Discriminator do
         it "happy path" do
-          ASR::Serializer.new.deserialize(Shape, %({"x":1,"y":2,"type":"point"}), :json).should be_a Point
+          ASR.serializer.deserialize(Shape, %({"x":1,"y":2,"type":"point"}), :json).should be_a Point
         end
 
         it "missing discriminator" do
           expect_raises(Exception, "Missing discriminator field 'type'.") do
-            ASR::Serializer.new.deserialize Shape, %({"x":1,"y":2}), :json
+            ASR.serializer.deserialize Shape, %({"x":1,"y":2}), :json
           end
         end
 
         it "unknown discriminator value" do
           expect_raises(Exception, "Unknown 'type' discriminator value: 'triangle'.") do
-            ASR::Serializer.new.deserialize Shape, %({"x":1,"y":2,"type":"triangle"}), :json
+            ASR.serializer.deserialize Shape, %({"x":1,"y":2,"type":"triangle"}), :json
           end
         end
       end
 
       describe NilableModel do
         it "should be set to `nil`" do
-          obj = ASR::Serializer.new.deserialize NilableModel, %({"nilable":"FOO","nilable_not_serializable":{"id":10}}), :json
+          obj = ASR.serializer.deserialize NilableModel, %({"nilable":"FOO","nilable_not_serializable":{"id":10}}), :json
           obj.nilable.should eq "FOO"
           obj.nilable_not_serializable.should be_nil
         end
@@ -108,14 +108,14 @@ describe ASR::Serializer do
 
       describe NilableArrayModel do
         it "should be set to `nil` or default if not provided" do
-          obj = ASR::Serializer.new.deserialize NilableArrayModel, %({}), :json
+          obj = ASR.serializer.deserialize NilableArrayModel, %({}), :json
           obj.nilable_array.should be_nil
           obj.default_array.should eq [] of Unserializable
           obj.nilable_nilable_array.should be_nil
         end
 
         it "should default to an empty array if provided or `nil` if possible" do
-          obj = ASR::Serializer.new.deserialize NilableArrayModel, %({"nilable_array":[{"id":1}],"default_array":[{"id":1}],"nilable_nilable_array":[{"id":1}]}), :json
+          obj = ASR.serializer.deserialize NilableArrayModel, %({"nilable_array":[{"id":1}],"default_array":[{"id":1}],"nilable_nilable_array":[{"id":1}]}), :json
           obj.nilable_array.should eq [] of Unserializable
           obj.default_array.should eq [] of Unserializable
           obj.nilable_nilable_array.should eq [nil]
@@ -124,7 +124,7 @@ describe ASR::Serializer do
 
       describe TestingModel do
         it "should deserialize correctly" do
-          obj = ASR::Serializer.new.deserialize TestingModel, %({"id":1,"array":[{"id":2},{"id":3}],"obj":{"id":4}}), :json
+          obj = ASR.serializer.deserialize TestingModel, %({"id":1,"array":[{"id":2},{"id":3}],"obj":{"id":4}}), :json
           obj.id.should eq 1
 
           array = obj.get_array
@@ -138,7 +138,7 @@ describe ASR::Serializer do
 
       describe ReverseConverterModel do
         it "should use the converter when deserializing" do
-          ASR::Serializer.new.deserialize(ReverseConverterModel, %({"str":"jim"}), :json).str.should eq "mij"
+          ASR.serializer.deserialize(ReverseConverterModel, %({"str":"jim"}), :json).str.should eq "mij"
         end
       end
     end
@@ -146,12 +146,12 @@ describe ASR::Serializer do
     describe "primitive" do
       it nil do
         expect_raises Exception, "Could not parse String from 'nil'." do
-          ASR::Serializer.new.deserialize String, "null", :json
+          ASR.serializer.deserialize String, "null", :json
         end
       end
 
       it Int32 do
-        value = ASR::Serializer.new.deserialize Int32, "17", :json
+        value = ASR.serializer.deserialize Int32, "17", :json
         value.should eq 17
         value.should be_a Int32
       end

@@ -1,12 +1,14 @@
 struct Athena::Serializer::Serializer
   include Athena::Serializer::SerializerInterface
 
+  def initialize(@navigator_factory : ASR::Navigators::NavigatorFactoryInterface = ASR::Navigators::NavigatorFactory.new); end
+
   def deserialize(type : _, input_data : String | IO, format : ASR::Format | String, context : ASR::DeserializationContext = ASR::DeserializationContext.new)
     # Initialize the context.  Currently just used to apply default exclusion strategies
     context.init
 
     visitor = self.get_deserialization_visitor_class(format).new
-    navigator = ASR::Navigators::DeserializationNavigator.new visitor, context
+    navigator = @navigator_factory.get_deserialization_navigator visitor, context
 
     visitor.navigator = navigator
 
@@ -24,7 +26,7 @@ struct Athena::Serializer::Serializer
     context.init
 
     visitor = self.get_serialization_visitor(format).new(io, named_args)
-    navigator = ASR::Navigators::SerializationNavigator.new visitor, context
+    navigator = @navigator_factory.get_serialization_navigator visitor, context
 
     visitor.navigator = navigator
 

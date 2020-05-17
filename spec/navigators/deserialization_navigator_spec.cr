@@ -25,7 +25,7 @@ describe ASR::Navigators::DeserializationNavigator do
           obj
         end
 
-        obj = ASR::Navigators::DeserializationNavigator.new(visitor, ASR::DeserializationContext.new).accept(PostDeserialize, data).as(PostDeserialize)
+        obj = ASR::Navigators::DeserializationNavigator.new(visitor, ASR::DeserializationContext.new, ASR::InstantiateObjectConstructor.new).accept(PostDeserialize, data).as(PostDeserialize)
 
         obj.first_name.should eq "First"
         obj.last_name.should eq "Last"

@@ -121,7 +121,7 @@ def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisi
   context.init
 
   visitor = visitor_type.new
-  navigator = ASR::Navigators::DeserializationNavigator.new visitor, context
+  navigator = ASR::Navigators::DeserializationNavigator.new visitor, context, ASR::InstantiateObjectConstructor.new
 
   visitor.navigator = navigator
 
