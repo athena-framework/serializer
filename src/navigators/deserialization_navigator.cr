@@ -22,7 +22,7 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
         if key = data[{{ann[:key]}}]?
           type = case key
             {% for k, t in ann[:map] %}
-              when {{k}} then {{t}}
+              when {{k.id.stringify}} then {{t}}
             {% end %}
           else
             raise "Unknown '#{{{ann[:key]}}}' discriminator value: '#{key}'."

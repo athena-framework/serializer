@@ -17,10 +17,22 @@ require "./exclusion_strategies/*"
 require "./navigators/*"
 require "./visitors/*"
 
+# Convenience alias to make referencing `Athena::Serializer` types easier.
 alias ASR = Athena::Serializer
+
+# Convenience alias to make referencing `Athena::Serializer::Annotations` types easier.
 alias ASRA = Athena::Serializer::Annotations
 
+# :nodoc:
+module JSON; end
+
+# :nodoc:
+module YAML; end
+
 module Athena::Serializer
+  # Returns an `ASR::SerializerInterface` instance for ad-hoc (de)serializaiton.
+  #
+  # The serializer is cached and only instantiated once.
   class_getter serializer : ASR::SerializerInterface { ASR::Serializer.new }
 
   enum Format
@@ -213,9 +225,3 @@ module Athena::Serializer
     end
   end
 end
-
-# :nodoc:
-module JSON; end
-
-# :nodoc:
-module YAML; end
