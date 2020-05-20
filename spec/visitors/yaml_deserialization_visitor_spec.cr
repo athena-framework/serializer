@@ -68,6 +68,11 @@ describe ASR::Visitors::YAMLDeserializationVisitor do
           assert_deserialized_output ASR::Visitors::YAMLDeserializationVisitor, TestEnum?, %("asdf"), nil
         end
       end
+
+      it Time do
+        assert_deserialized_output ASR::Visitors::YAMLDeserializationVisitor, Time, %("2020-04-07T12:34:56Z"), Time.utc 2020, 4, 7, 12, 34, 56
+        assert_deserialized_output ASR::Visitors::YAMLDeserializationVisitor, Time?, %("2020-04-07T12:34:56Z"), Time.utc 2020, 4, 7, 12, 34, 56
+      end
     end
   end
 end

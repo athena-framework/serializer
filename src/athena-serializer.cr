@@ -236,15 +236,15 @@ module Athena::Serializer
         # Attempts to extract a value from the *data* for the given *property*.
         # Returns `nil` if a value could not be extracted.
         private def extract_value(property : ASR::PropertyMetadataBase, data : ASR::Any, path : Tuple?) : ASR::Any?
-          if value = data[property.external_name]?
-            return value
-          end
-
           if path && (value = data.dig?(*path))
             return value
           end
 
-          if (key = property.aliases.find { |a| data[a]? }) && (value = data[key]?)
+           if (key = property.aliases.find { |a| data[a]? }) && (value = data[key]?)
+            return value
+          end
+
+          if value = data[property.external_name]?
             return value
           end
 
