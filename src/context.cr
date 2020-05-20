@@ -47,7 +47,7 @@ abstract class Athena::Serializer::Context
     @initialized = true
   end
 
-  # Sets the group(s) to compare against properties' `ASR::Groups` annotations.
+  # Sets the group(s) to compare against properties' `ASRA::Groups` annotations.
   #
   # Adds a `ASR::ExclusionStrategies::Groups` automatically if set.
   def groups=(groups : Array(String)) : self
@@ -58,7 +58,7 @@ abstract class Athena::Serializer::Context
     self
   end
 
-  # Sets the *version* to compare against properties' `ASR::Since` and `ASR::Until` annotations.
+  # Sets the *version* to compare against properties' `ASRA::Since` and `ASRA::Until` annotations.
   #
   # Adds an `ASR::ExclusionStrategies::Version` automatically if set.
   def version=(version : String) : self

@@ -126,7 +126,6 @@ module Athena::Serializer::Annotations
   # ## Fields
   # * `key : String` - The field that should be read from the data to determine the correct type.
   # * `map : Hash | NamedTuple` - Maps the possible `key` values to their corresponding types.
-  # * `groups : Array | Tuple` - (optional) Groups to apply to the `ASR::DeserializationContext` as an `ASR::ExclusionStrategies::Groups`.
   #
   # ## Example
   #

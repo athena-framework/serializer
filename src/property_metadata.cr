@@ -4,7 +4,7 @@ module Athena::Serializer::PropertyMetadataBase
   include Athena::Serializer::Metadata
 end
 
-struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
+struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType, PathType)
   include Athena::Serializer::PropertyMetadataBase
 
   # The name of the property.
@@ -47,6 +47,8 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   # See `CRS::SkipWhenEmpty`.
   getter? skip_when_empty : Bool
 
+  getter path : PathType? = nil
+
   def initialize(
     @name : String,
     @external_name : String,
@@ -56,6 +58,7 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
     @aliases : Array(String) = [] of String,
     @since_version : SemanticVersion? = nil,
     @until_version : SemanticVersion? = nil,
+    @path : PathType? = nil,
     @type : IvarType.class = IvarType,
     @class : ClassType.class = ClassType
   )
