@@ -7,8 +7,11 @@ module Athena::Serializer::Annotations
   # * `getter` - A method name whose return value will be used as the serialized value.
   # * `setter` - A method name that accepts the deserialized value.  Can be used to apply additional logic before setting the properties value.
   # * `converter` - A module that defines a `.deserialize` method.  Can be used to share common deserialization between types.
+  # * `path : Tuple` - A set of keys used to navigate to a value during deserialization.  The value of the last key will be used as the property's value.
   #
   # ## Example
+  #
+  # ### Getter/Setter
   #
   # ```
   # class AccessorExample
@@ -32,6 +35,8 @@ module Athena::Serializer::Annotations
   # ASR.serializer.deserialize AccessorExample, %({"foo":"bar"}), :json # => #<AccessorExample:0x7f5915e25c20 @foo="BAR">
   # ```
   #
+  # ### Converter
+  #
   # ```
   # module ReverseConverter
   #   def self.deserialize(navigator : ASR::Navigators::DeserializationNavigatorInterface, metadata : ASR::PropertyMetadataBase, data : ASR::Any) : String
@@ -47,6 +52,53 @@ module Athena::Serializer::Annotations
   # end
   #
   # ASR.serializer.deserialize ConverterExample, %({"str":"jim"}), :json # => #<ConverterExample:0x7f9745fa6d60 @str="mij">
+  # ```
+  #
+  # ### Path
+  #
+  # ```
+  # class Example
+  #   include ASR::Serializable
+  #
+  #   getter id : Int64
+  #
+  #   @[ASRA::Accessor(path: {"stats", "HP"})]
+  #   getter hp : Int32
+  #
+  #   @[ASRA::Accessor(path: {"stats", "Attack"})]
+  #   getter attack : Int32
+  #
+  #   @[ASRA::Accessor(path: {"downs", -1, "last_down"})]
+  #   getter last_down : Time
+  # end
+  #
+  # DATA = <<-JSON
+  # {
+  #   "id": 1,
+  #   "stats": {
+  #     "HP": 45,
+  #     "Attack": 49
+  #   },
+  #   "downs": [
+  #     {
+  #       "id": 1,
+  #       "last_down": "2020-05-019T05:23:17Z"
+  #     },
+  #     {
+  #       "id": 2,
+  #       "last_down": "2020-04-07T12:34:56Z"
+  #     }
+  #   ]
+  #
+  # }
+  # JSON
+  #
+  # ASR.serializer.deserialize Example, DATA, :json
+  # # #<Example:0x7f43c4ddf580
+  # #  @attack=49,
+  # #  @hp=45,
+  # #  @id=1,
+  # #  @last_down=2020-04-07 12:34:56.0 UTC>
   # ```
   annotation Accessor; end
 

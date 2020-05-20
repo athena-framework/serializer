@@ -176,25 +176,13 @@ module Athena::Serializer
                    end %}
 
               {{instance_vars.map do |ivar|
-                  path = (ann = ivar.annotation(ASRA::Accessor)) && !ann[:path].nil? ? ann[:path] : nil
-                  path_type = unless path
-                    Nil
-                  else
-                    types = [] of Nil
-                    (0...path.size).each do |t|
-                      types << path.of
-                    end
-                    %(Tuple(#{types.splat})).id
-                  end
-
-                  %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}, #{path_type}).new(
+                  %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
                     name: #{ivar.name.stringify},
                     external_name: #{(ann = ivar.annotation(ASRA::Name)) && (name = ann[:deserialize]) ? name : ivar.name.stringify},
                     aliases: #{(ann = ivar.annotation(ASRA::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
                     groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
                     since_version: #{(ann = ivar.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
                     until_version: #{(ann = ivar.annotation(ASRA::Until)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
-                    path: #{path ? {path.splat} : path}
                   )).id
                 end}} of ASR::PropertyMetadataBase
             {% end %}
@@ -218,14 +206,12 @@ module Athena::Serializer
         def initialize(navigator : ASR::Navigators::DeserializationNavigatorInterface, properties : Array(ASR::PropertyMetadataBase), data : ASR::Any)
           {% begin %}
             {% for ivar, idx in @type.instance_vars %}
-              if (prop = properties.find { |p| p.name == {{ivar.name.stringify}} }) && ((val = data[prop.external_name]?) || ((key = prop.aliases.find { |a| data[a]? }) && (val = data[key]?)) || ((path = prop.path) && (val = data.dig?(*path))))
-                value = val.try do |v|
-                        {% if (ann = ivar.annotation(ASRA::Accessor)) && (converter = ann[:converter]) %}
-                          {{converter.id}}.deserialize navigator, prop, v
+              if (prop = properties.find { |p| p.name == {{ivar.name.stringify}} }) && (val = extract_value(prop, data, {{(ann = ivar.annotation(ASRA::Accessor)) ? ann[:path] : nil}}))
+                value = {% if (ann = ivar.annotation(ASRA::Accessor)) && (converter = ann[:converter]) %}
+                          {{converter.id}}.deserialize navigator, prop, val
                         {% else %}
-                          navigator.accept {{ivar.type}}, v
+                          navigator.accept {{ivar.type}}, val
                         {% end %}
-                      end
 
                 unless value.nil?
                   @{{ivar.id}} = value
@@ -245,6 +231,24 @@ module Athena::Serializer
               {% end %}
             {% end %}
           {% end %}
+        end
+
+        # Attempts to extract a value from the *data* for the given *property*.
+        # Returns `nil` if a value could not be extracted.
+        private def extract_value(property : ASR::PropertyMetadataBase, data : ASR::Any, path : Tuple?) : ASR::Any?
+          if value = data[property.external_name]?
+            return value
+          end
+
+          if path && (value = data.dig?(*path))
+            return value
+          end
+
+          if (key = property.aliases.find { |a| data[a]? }) && (value = data[key]?)
+            return value
+          end
+
+          nil
         end
       {% end %}
     end

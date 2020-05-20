@@ -151,6 +151,11 @@ def Enum.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, d
 end
 
 # :nodoc:
+def Time.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
+  Time::Format::ISO_8601_DATE_TIME.parse(data.as_s)
+end
+
+# :nodoc:
 def Union.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
   {% begin %}
 
