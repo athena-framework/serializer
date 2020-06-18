@@ -1,6 +1,4 @@
 module Athena::Serializer::Navigators::SerializationNavigatorInterface
-  abstract def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext)
-
   abstract def accept(data : ASR::Serializable) : Nil
   abstract def accept(data : _) : Nil
 end
