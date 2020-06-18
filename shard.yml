@@ -1,22 +1,22 @@
-name: athena-COMPONENT_NAME
+name: athena-serializer
 
 version: 0.1.0
 
-crystal: 0.32.0
+crystal: 0.35.0
 
 license: MIT
 
-repository: https://github.com/athena-framework/COMPONENT_NAME
+repository: https://github.com/athena-framework/serializer
 
-documentation: https://athena-framework.github.io/COMPONENT_NAME/Athena/NAMESPACE_NAME.html
+documentation: https://athena-framework.github.io/serializer/Athena/Serializer.html
 
 description: |
-  DESCRIPTION.
+  Object (de)serialization library.
 
 authors:
-  - CREATOR_NAME <CREATOR_EMAIL>
+  - George Dietrich <george@dietrich.app>
 
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
-    version: ~> 0.11.0
+    version: ~> 0.12.0

@@ -1,11 +1,9 @@
 name: CI
 
 on:
-  push:
+  pull_request:
     branches:
-      - '*/*'
-      -  '*'
-      - '!master'
+      - 'master'
   schedule:
     - cron: '0 21 * * *'
 
@@ -15,7 +13,7 @@ jobs:
     container:
       image: crystallang/crystal
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Format
         run: crystal tool format --check
   coding_standards:
@@ -23,7 +21,7 @@ jobs:
     container:
       image: crystallang/crystal
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install Dependencies
         run: shards install
       - name: Ameba
@@ -33,7 +31,7 @@ jobs:
     container:
       image: crystallang/crystal
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Specs
         run: crystal spec --order random --error-on-warnings
   test_nightly:
@@ -41,6 +39,6 @@ jobs:
     container:
       image: crystallang/crystal:nightly
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Specs
         run: crystal spec --order random --error-on-warnings
