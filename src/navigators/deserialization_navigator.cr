@@ -1,5 +1,5 @@
 module Athena::Serializer::Navigators::DeserializationNavigatorInterface
-  abstract def accept(type : T, data : ASR::Any) forall T
+  abstract def accept(type, data : ASR::Any)
 end
 
 struct Athena::Serializer::Navigators::DeserializationNavigator
