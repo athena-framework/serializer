@@ -57,6 +57,20 @@ class ReverseConverterModel
   getter str : String
 end
 
+abstract struct BaseModel
+  include ASR::Model
+end
+
+record ModelOne < BaseModel, id : Int32, name : String do
+  include ASR::Serializable
+end
+
+record ModelTwo < BaseModel, id : Int32, name : String do
+  include ASR::Serializable
+end
+
+record Unionable, type : BaseModel.class
+
 describe ASR::Serializer do
   describe "#deserialize" do
     describe ASR::Serializable do
@@ -154,6 +168,15 @@ describe ASR::Serializer do
         value = ASR.serializer.deserialize Int32, "17", :json
         value.should eq 17
         value.should be_a Int32
+      end
+    end
+
+    describe Unionable do
+      it "it works with a class union" do
+        model = ASR.serializer.deserialize Unionable.new(ModelOne).type, %({"id":1,"name":"Fred"}), :json
+        model.should be_a ModelOne
+        model.id.should eq 1
+        model.name.should eq "Fred"
       end
     end
   end

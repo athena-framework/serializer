@@ -24,7 +24,7 @@ struct JSON::Any
   include Athena::Serializer::Any
 
   def is_nil? : Bool
-    @raw.is_a? Nil
+    @raw.nil?
   end
 end
 
@@ -33,6 +33,6 @@ struct YAML::Any
   include Athena::Serializer::Any
 
   def is_nil? : Bool
-    @raw.is_a? Nil
+    @raw.nil?
   end
 end

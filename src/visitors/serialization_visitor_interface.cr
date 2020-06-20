@@ -11,7 +11,7 @@ module Athena::Serializer::Visitors::SerializationVisitorInterface
   abstract def visit(data : NamedTuple) : Nil
   abstract def visit(data : Nil) : Nil
   abstract def visit(data : Number) : Nil
-  abstract def visit(data : ASR::Serializable) : Nil
+  abstract def visit(data : ASR::Model) : Nil
   abstract def visit(data : String) : Nil
   abstract def visit(data : Symbol) : Nil
   abstract def visit(data : Time) : Nil

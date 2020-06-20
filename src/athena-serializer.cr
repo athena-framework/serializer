@@ -31,7 +31,7 @@ module JSON; end
 module YAML; end
 
 module Athena::Serializer
-  # Returns an `ASR::SerializerInterface` instance for ad-hoc (de)serializaiton.
+  # Returns an `ASR::SerializerInterface` instance for ad-hoc (de)serialization.
   #
   # The serializer is cached and only instantiated once.
   class_getter serializer : ASR::SerializerInterface { ASR::Serializer.new }
@@ -63,9 +63,50 @@ module Athena::Serializer
   # Custom strategies can be implemented by via `ExclusionStrategies::ExclusionStrategyInterface`.
   #
   # OPTIMIZE:  Once feasible, support compile time exclusion strategies.
-  module Athena::Serializer::ExclusionStrategies
-  end
+  module Athena::Serializer::ExclusionStrategies; end
 
+  # Used to denote a type that is (de)serializable.
+  #
+  # This module can be used to make the compiler happy in some situations, it doesn't do anything on its own.
+  # You most likely want to use `ASR::Serializable` instead.
+  #
+  # ```
+  # require "athena-serializer"
+  #
+  # abstract struct BaseModel
+  #   # `ASR::Model` is needed here to ensure typings are correct for the deserialization process.
+  #   # Child types should still include `ASR::Serializable`.
+  #   include ASR::Model
+  # end
+  #
+  # record ModelOne < BaseModel, id : Int32, name : String do
+  #   include ASR::Serializable
+  # end
+  #
+  # record ModelTwo < BaseModel, id : Int32, name : String do
+  #   include ASR::Serializable
+  # end
+  #
+  # record Unionable, type : BaseModel.class
+  # ```
+  module Athena::Serializer::Model; end
+
+  # Adds the necessary methods to a `struct`/`class` to allow for (de)serialization of that type.
+  #
+  # ```
+  # require "athena-serializer"
+  #
+  # record Example, id : Int32, name : String do
+  #   include ASR::Serializable
+  # end
+  #
+  # obj = ASR.serializer.deserialize Example, %({"id":1,"name":"George"}), :json
+  # obj                                 # => Example(@id=1, @name="George")
+  # ASR.serializer.serialize obj, :yaml # =>
+  # # ---
+  # # id: 1
+  # # name: George
+  # ```
   module Serializable
     abstract def serialization_properties : Array(ASR::PropertyMetadataBase)
     abstract def run_preserialize : Nil
@@ -74,6 +115,8 @@ module Athena::Serializer
 
     macro included
       {% verbatim do %}
+        include ASR::Model
+
         # :nodoc:
         def run_preserialize : Nil
           {% for method in @type.methods.select { |m| m.annotation(ASRA::PreSerialize) } %}

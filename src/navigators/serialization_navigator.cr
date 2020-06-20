@@ -1,5 +1,5 @@
 module Athena::Serializer::Navigators::SerializationNavigatorInterface
-  abstract def accept(data : ASR::Serializable) : Nil
+  abstract def accept(data : ASR::Model) : Nil
   abstract def accept(data : _) : Nil
 end
 
@@ -8,7 +8,7 @@ struct Athena::Serializer::Navigators::SerializationNavigator
 
   def initialize(@visitor : ASR::Visitors::SerializationVisitorInterface, @context : ASR::SerializationContext); end
 
-  def accept(data : ASR::Serializable) : Nil
+  def accept(data : ASR::Model) : Nil
     data.run_preserialize
 
     properties = data.serialization_properties
