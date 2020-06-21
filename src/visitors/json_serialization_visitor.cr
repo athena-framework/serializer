@@ -47,7 +47,7 @@ class Athena::Serializer::Visitors::JSONSerializationVisitor
     @builder.bool data
   end
 
-  def visit(data : Serializable) : Nil
+  def visit(data : ASR::Model) : Nil
     navigator.accept data
   end
 
