@@ -138,6 +138,68 @@ describe ASR::Serializable do
           p.class.should eq SerializedName
         end
       end
+
+      describe :strategy do
+        it :camelcase do
+          properties = SerializedNameCamelcaseStrategy.new.serialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "twoWOrds"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "myZipCode"
+        end
+
+        it :underscore do
+          properties = SerializedNameUnderscoreStrategy.new.serialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "two_w_ords"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "my_zip_code"
+        end
+
+        it :identical do
+          properties = SerializedNameIdenticalStrategy.new.serialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "two_wOrds"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "myZipCode"
+        end
+      end
     end
 
     describe ASRA::SkipWhenEmpty do

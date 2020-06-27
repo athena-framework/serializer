@@ -158,7 +158,27 @@ module Athena::Serializer
             {% property_hash = {} of Nil => Nil %}
 
             {% for ivar in instance_vars %}
-              {% external_name = (ann = ivar.annotation(ASRA::Name)) && (name = ann[:serialize]) ? name : ivar.name.stringify %}
+              {% ivar_name = ivar.name.stringify %}
+
+              # Determine the serialized name of the ivar:
+              # 1. If the ivar has an `ASRA::Name` annotation with a `serialize` field, use that
+              # 2. If the type has an `ASRA::Name` annotation with a `strategy`, use that strategy
+              # 3. Fallback on the name of the ivar
+              {% external_name = if (name_ann = ivar.annotation(ASRA::Name)) && (serialized_name = name_ann[:serialize])
+                                   serialized_name
+                                 elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:strategy])
+                                   if strategy == :camelcase
+                                     ivar_name.camelcase(lower: true)
+                                   elsif strategy == :underscore
+                                     ivar_name.underscore
+                                   elsif strategy == :identical
+                                     ivar_name
+                                   else
+                                     strategy.raise "Invalid ASRA::Name strategy: '#{strategy}'."
+                                   end
+                                 else
+                                   ivar_name
+                                 end %}
 
               {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}, #{@type}).new(
                   name: #{ivar.name.stringify},
@@ -173,7 +193,7 @@ module Athena::Serializer
 
             {% for m in @type.methods.select { |method| method.annotation(ASRA::VirtualProperty) } %}
               {% method_name = m.name %}
-              {% m.raise "VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
+              {% m.raise "ASRA::VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
               {% external_name = (ann = m.annotation(ASRA::Name)) && (name = ann[:serialize]) ? name : m.name.stringify %}
 
               {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{m.return_type}, #{@type}).new(
@@ -188,10 +208,10 @@ module Athena::Serializer
               {% if ann[0] == :alphabetical %}
                 {% properties = property_hash.keys.sort.map { |key| property_hash[key] } %}
               {% elsif ann[0] == :custom && !ann[:order].nil? %}
-                {% ann.raise "Not all properties were defined in the custom order for '#{@type}'" unless property_hash.keys.all? { |prop| ann[:order].map(&.id.stringify).includes? prop } %}
-                {% properties = ann[:order].map { |val| property_hash[val.id.stringify] || raise "Unknown instance variable: '#{val.id}'" } %}
+                {% ann.raise "Not all properties were defined in the custom order for '#{@type}'." unless property_hash.keys.all? { |prop| ann[:order].map(&.id.stringify).includes? prop } %}
+                {% properties = ann[:order].map { |val| property_hash[val.id.stringify] || raise "Unknown instance variable: '#{val.id}'." } %}
               {% else %}
-                {% ann.raise "Invalid ASR::AccessorOrder value: '#{ann[0].id}'" %}
+                {% ann.raise "Invalid ASR::AccessorOrder value: '#{ann[0].id}'." %}
               {% end %}
             {% else %}
               {% properties = property_hash.values %}
