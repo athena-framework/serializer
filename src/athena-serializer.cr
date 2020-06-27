@@ -168,7 +168,7 @@ module Athena::Serializer
                                    serialized_name
                                  elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:strategy])
                                    if strategy == :camelcase
-                                     ivar_name.camelcase(lower: true)
+                                     ivar_name.camelcase lower: true
                                    elsif strategy == :underscore
                                      ivar_name.underscore
                                    elsif strategy == :identical

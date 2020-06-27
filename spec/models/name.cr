@@ -23,6 +23,7 @@ class SerializedNameCamelcaseStrategy
   @[ASRA::Name(serialize: "myAdd_ress")]
   property my_home_address : String = "123 Fake Street"
 
+  # ameba:disable Style/VariableNames
   property two_wOrds : String = "two words"
 
   # ameba:disable Style/VariableNames
@@ -39,6 +40,7 @@ class SerializedNameUnderscoreStrategy
   @[ASRA::Name(serialize: "myAdd_ress")]
   property my_home_address : String = "123 Fake Street"
 
+  # ameba:disable Style/VariableNames
   property two_wOrds : String = "two words"
 
   # ameba:disable Style/VariableNames
@@ -55,6 +57,7 @@ class SerializedNameIdenticalStrategy
   @[ASRA::Name(serialize: "myAdd_ress")]
   property my_home_address : String = "123 Fake Street"
 
+  # ameba:disable Style/VariableNames
   property two_wOrds : String = "two words"
 
   # ameba:disable Style/VariableNames

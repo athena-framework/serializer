@@ -328,6 +328,7 @@ module Athena::Serializer::Annotations
   # * `serialize : String` - The key to use for this property during serialization.
   # * `deserialize : String` - The key to use for this property during deserialization.
   # * `aliases : Array(String)` - A set of keys to use for this property during deserialization; is equivalent to multiple `deserialize` keys.
+  # * `strategy : Symbol` - Defines the default serialization naming strategy for this type.  Can be overridden using the `serialize` field.
   #
   # ## Example
   #
@@ -354,6 +355,33 @@ module Athena::Serializer::Annotations
   # obj.my_home_address # => "555 Mason Ave"
   # obj.both_names      # => "deserialized from diff key"
   # obj.some_value      # => "some_other_val"
+  # ```
+  #
+  # ### Naming Strategies
+  #
+  # By default the keys in the serialized data match exactly to the name of the property.
+  # Naming strategies allow changing this behavior for all properties within the type.
+  # The serialized name can still be overridden on a per-property basis via
+  # using the `ASRA::Name` annotation with the `serialize` field.
+  #
+  # The available naming strategies include:
+  # * `:camelcase`
+  # * `:underscore`
+  # * `:identical`
+  #
+  # ```
+  # @[ASRA::Name(strategy: :camelcase)]
+  # class User
+  #   include ASR::Serializable
+  #
+  #   def initialize; end
+  #
+  #   property id : Int32 = 1
+  #   property first_name : String = "Jon"
+  #   property last_name : String = "Snow"
+  # end
+  #
+  # ASR.serializer.serialize User.new, :json # => {"id":1,"firstName":"Jon","lastName":"Snow"}
   # ```
   annotation Name; end
 
