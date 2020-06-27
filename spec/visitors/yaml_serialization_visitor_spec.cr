@@ -40,7 +40,11 @@ describe ASR::Visitors::YAMLSerializationVisitor do
       end
 
       it Nil do
-        assert_serialized_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string "--- \n") do |visitor|
+        str = "---"
+        str += " " if YAML.libyaml_version < SemanticVersion.new(0, 2, 5)
+        str += '\n'
+
+        assert_serialized_output(ASR::Visitors::YAMLSerializationVisitor, build_expected_yaml_string str) do |visitor|
           visitor.visit nil
         end
       end

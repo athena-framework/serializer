@@ -13,6 +13,57 @@ class SerializedName
   property myZipCode : Int32 = 90210
 end
 
+@[ASRA::Name(strategy: :camelcase)]
+class SerializedNameCamelcaseStrategy
+  include ASR::Serializable
+
+  def initialize; end
+
+  # Is overridable
+  @[ASRA::Name(serialize: "myAdd_ress")]
+  property my_home_address : String = "123 Fake Street"
+
+  # ameba:disable Style/VariableNames
+  property two_wOrds : String = "two words"
+
+  # ameba:disable Style/VariableNames
+  property myZipCode : Int32 = 90210
+end
+
+@[ASRA::Name(strategy: :underscore)]
+class SerializedNameUnderscoreStrategy
+  include ASR::Serializable
+
+  def initialize; end
+
+  # Is overridable
+  @[ASRA::Name(serialize: "myAdd_ress")]
+  property my_home_address : String = "123 Fake Street"
+
+  # ameba:disable Style/VariableNames
+  property two_wOrds : String = "two words"
+
+  # ameba:disable Style/VariableNames
+  property myZipCode : Int32 = 90210
+end
+
+@[ASRA::Name(strategy: :identical)]
+class SerializedNameIdenticalStrategy
+  include ASR::Serializable
+
+  def initialize; end
+
+  # Is overridable
+  @[ASRA::Name(serialize: "myAdd_ress")]
+  property my_home_address : String = "123 Fake Street"
+
+  # ameba:disable Style/VariableNames
+  property two_wOrds : String = "two words"
+
+  # ameba:disable Style/VariableNames
+  property myZipCode : Int32 = 90210
+end
+
 class DeserializedName
   include ASR::Serializable
 
