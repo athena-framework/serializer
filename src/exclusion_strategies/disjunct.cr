@@ -1,6 +1,6 @@
 require "./exclusion_strategy_interface"
 
-# Wraps an `Array(ASR::ExclusionStrategies::ExclusionStrategy)`, excluding a property if any member skips it.
+# Wraps an `Array(ASR::ExclusionStrategies::ExclusionStrategyInterface)`, excluding a property if any member skips it.
 #
 # Used internally to allow multiple exclusion strategies to be used within a single instance variable for `ASR::Context#add_exclusion_strategy`.
 struct Athena::Serializer::ExclusionStrategies::Disjunct

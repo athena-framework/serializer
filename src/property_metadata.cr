@@ -1,9 +1,11 @@
-module Athena::Serializer::Metadata; end
+# Parent type of a property metadata just used for typing.
+#
+# See `ASR::PropertyMetadata`.
+module Athena::Serializer::PropertyMetadataBase; end
 
-module Athena::Serializer::PropertyMetadataBase
-  include Athena::Serializer::Metadata
-end
-
+# Stores metadata related to a specific property.
+#
+# This includes its name (internal and external), value, versions/groups, and any aliases.
 struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   include Athena::Serializer::PropertyMetadataBase
 
@@ -13,7 +15,7 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   # The name that should be used for serialization/deserialization.
   getter external_name : String
 
-  # The value of the property.
+  # The value of the property (when serializing).
   getter value : ValueType
 
   # The type of the property.
@@ -24,27 +26,27 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
 
   # Represents the first version this property is available.
   #
-  # See `CrSerializer::ExclusionStrategies::Version`.
+  # See `ASR::ExclusionStrategies::Version`.
   property since_version : SemanticVersion?
 
   # Represents the last version this property was available.
   #
-  # See `CrSerializer::ExclusionStrategies::Version`.
+  # See `ASR::ExclusionStrategies::Version`.
   property until_version : SemanticVersion?
 
   # The serialization groups this property belongs to.
   #
-  # See `CrSerializer::ExclusionStrategies::Groups`.
+  # See `ASR::ExclusionStrategies::Groups`.
   getter groups : Array(String) = ["default"]
 
   # Deserialize this property from the property's name or any name in *aliases*.
   #
-  # See `CRS::Name`.
+  # See `ASRA::Name`.
   getter aliases : Array(String)
 
   # If this property should not be serialized if it is empty.
   #
-  # See `CRS::SkipWhenEmpty`.
+  # See `ASRA::SkipWhenEmpty`.
   getter? skip_when_empty : Bool
 
   def initialize(
