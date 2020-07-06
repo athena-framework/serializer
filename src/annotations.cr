@@ -234,8 +234,6 @@ module Athena::Serializer::Annotations
   # Defines the default exclusion policy to use on a class.  Valid values: `:none`, and `:all`.
   #
   # Used with `ASRA::Expose` and `ASRA::Exclude`.
-  #
-  # See`ASRA::ExclusionPolicy`.
   annotation ExclusionPolicy; end
 
   # Indicates that a property should be serialized/deserialized when used with `:all` `ASRA::ExclusionPolicy`.
@@ -476,7 +474,7 @@ module Athena::Serializer::Annotations
   # ## Example
   #
   # ```
-  # class ReadOnly
+  # class Example
   #   include ASR::Serializable
   #
   #   property name : String
@@ -485,7 +483,7 @@ module Athena::Serializer::Annotations
   #   property password : String?
   # end
   #
-  # obj = ASR.serializer.deserialize ReadOnly, %({"name":"Fred","password":"password1"}), :json
+  # obj = ASR.serializer.deserialize Example, %({"name":"Fred","password":"password1"}), :json
   #
   # obj.name     # => "Fred"
   # obj.password # => nil
@@ -517,7 +515,8 @@ module Athena::Serializer::Annotations
   #   property password : String = "monkey"
   # end
   #
-  # ASR.serializer.serialize Example.new, :json # => {"name":"Fred"}
+  # ASR.serializer.deserialize Example, %({"name":"Fred","password":"foobar"}), :json # => #<Example:0x7fe4dc98bce0 @name="Fred", @password="monkey">
+  # ASR.serializer.serialize Example.new, :json                                       # => {"name":"Fred"}
   # ```
   annotation Skip; end
 

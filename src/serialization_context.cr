@@ -1,4 +1,4 @@
-# The `ASR::Context` specific to deserialization.
+# The `ASR::Context` specific to serialization.
 #
 # Allows specifying if `nil` values should be serialized.
 class Athena::Serializer::SerializationContext < Athena::Serializer::Context
