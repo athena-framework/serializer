@@ -165,7 +165,7 @@ def Union.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, 
       {% if type == Nil %}
         return nil if data.is_nil?
       {% elsif type < Int %}
-        if value = data.as_i?
+        if value = data.as_i64?
           return {{type}}.new! value
         end
       {% elsif type < Float %}
