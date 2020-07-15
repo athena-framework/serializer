@@ -49,9 +49,13 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   # See `ASRA::SkipWhenEmpty`.
   getter? skip_when_empty : Bool
 
+  # Returns any custom configuration annotations registered via `Athena::Config.register_configuration_annotation` and applied to the property.
+  getter custom_configurations : ACF::AnnotationConfigurations
+
   def initialize(
     @name : String,
     @external_name : String,
+    @custom_configurations : ACF::AnnotationConfigurations,
     @value : ValueType = nil,
     @skip_when_empty : Bool = false,
     @groups : Array(String) = ["default"],

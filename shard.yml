@@ -16,6 +16,11 @@ description: |
 authors:
   - George Dietrich <george@dietrich.app>
 
+dependencies:
+  athena-config:
+    github: athena-framework/config
+    branch: configuration-annotations
+
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
