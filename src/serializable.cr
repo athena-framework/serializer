@@ -107,7 +107,7 @@ module Athena::Serializer::Serializable
                 {% annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id %}
               {% end %}
 
-              {% custom_configurations[ann_class] = "#{annotations} of ACF::Annotations::ConfigurationBase".id unless annotations.empty? %}
+              {% custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
             {% end %}
 
             {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}, #{@type}).new(
@@ -140,7 +140,7 @@ module Athena::Serializer::Serializable
                 {% annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id %}
               {% end %}
 
-              {% method_custom_configurations[ann_class] = "#{annotations} of ACF::Annotations::ConfigurationBase".id unless annotations.empty? %}
+              {% method_custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
             {% end %}
 
             {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{m.return_type}, #{@type}).new(
@@ -200,7 +200,7 @@ module Athena::Serializer::Serializable
                     annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id
                   end
 
-                  custom_configurations[ann_class] = "#{annotations} of ACF::Annotations::ConfigurationBase".id unless annotations.empty?
+                  custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty?
                 end
 
                 %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
