@@ -94,7 +94,7 @@ module Athena::Serializer::Serializable
                                  ivar_name
                                end %}
 
-            {% custom_configurations = {} of Nil => Nil %}
+            {% annotation_configurations = {} of Nil => Nil %}
 
             {% for ann_class in ACF::CUSTOM_ANNOTATIONS %}
               {% ann_class = ann_class.resolve %}
@@ -107,13 +107,13 @@ module Athena::Serializer::Serializable
                 {% annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id %}
               {% end %}
 
-              {% custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
+              {% annotation_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
             {% end %}
 
             {% property_hash[external_name] = %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}, #{@type}).new(
                 name: #{ivar.name.stringify},
                 external_name: #{external_name},
-                custom_configurations: ACF::AnnotationConfigurations.new(#{custom_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
+                annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                 value: #{(accessor = ivar.annotation(ASRA::Accessor)) && accessor[:getter] != nil ? accessor[:getter].id : %(@#{ivar.id}).id},
                 skip_when_empty: #{!!ivar.annotation(ASRA::SkipWhenEmpty)},
                 groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
@@ -127,7 +127,7 @@ module Athena::Serializer::Serializable
             {% m.raise "ASRA::VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
             {% external_name = (ann = m.annotation(ASRA::Name)) && (name = ann[:serialize]) ? name : m.name.stringify %}
 
-            {% method_custom_configurations = {} of Nil => Nil %}
+            {% method_annotation_configurations = {} of Nil => Nil %}
 
             {% for ann_class in ACF::CUSTOM_ANNOTATIONS %}
               {% ann_class = ann_class.resolve %}
@@ -140,13 +140,13 @@ module Athena::Serializer::Serializable
                 {% annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id %}
               {% end %}
 
-              {% method_custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
+              {% method_annotation_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty? %}
             {% end %}
 
             {% property_hash[external_name] = %(ASR::PropertyMetadata(#{m.return_type}, #{m.return_type}, #{@type}).new(
                 name: #{m.name.stringify},
                 external_name: #{external_name},
-                custom_configurations: ACF::AnnotationConfigurations.new(#{method_custom_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
+                annotation_configurations: ACF::AnnotationConfigurations.new(#{method_annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                 value: #{m.name.id},
                 skip_when_empty: #{!!m.annotation(ASRA::SkipWhenEmpty)},
               )).id %}
@@ -187,7 +187,7 @@ module Athena::Serializer::Serializable
                  end %}
 
             {{instance_vars.map do |ivar|
-                custom_configurations = {} of Nil => Nil
+                annotation_configurations = {} of Nil => Nil
 
                 ACF::CUSTOM_ANNOTATIONS.each do |ann_class|
                   ann_class = ann_class.resolve
@@ -200,13 +200,13 @@ module Athena::Serializer::Serializable
                     annotations << "#{ann_class}Configuration.new(#{ann.args.empty? ? "".id : "#{ann.args.splat},".id}#{ann.named_args.double_splat})".id
                   end
 
-                  custom_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty?
+                  annotation_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty?
                 end
 
                 %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
                   name: #{ivar.name.stringify},
                   external_name: #{(ann = ivar.annotation(ASRA::Name)) && (name = ann[:deserialize]) ? name : ivar.name.stringify},
-                  custom_configurations: ACF::AnnotationConfigurations.new(#{custom_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
+                  annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                   aliases: #{(ann = ivar.annotation(ASRA::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
                   groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
                   since_version: #{(ann = ivar.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},

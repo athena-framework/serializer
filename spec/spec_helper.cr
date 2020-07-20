@@ -14,7 +14,7 @@ def get_test_property_metadata : Array(ASR::PropertyMetadataBase)
   [ASR::PropertyMetadata(String, String, TestObject).new(
     name: "name",
     external_name: "external_name",
-    custom_configurations: ACF::AnnotationConfigurations.new,
+    annotation_configurations: ACF::AnnotationConfigurations.new,
     value: "YES",
     skip_when_empty: false,
     groups: ["default"],
@@ -130,8 +130,17 @@ def assert_deserialized_output(visitor_type : ASR::Visitors::DeserializationVisi
   result.should eq expected
 end
 
-def create_metadata(*, name : String = "name", external_name : String = "external_name", value : I = "value", skip_when_empty : Bool = false, groups : Array(String) = ["default"], since_version : String? = nil, until_version : String? = nil) : ASR::PropertyMetadata forall I
-  context = ASR::PropertyMetadata(I, I, EmptyObject).new name, external_name, ACF::AnnotationConfigurations.new, value, skip_when_empty, groups
+def create_metadata(
+  *,
+  name : String = "name",
+  external_name : String = "external_name",
+  value : I = "value", skip_when_empty : Bool = false,
+  groups : Array(String) = ["default"],
+  since_version : String? = nil,
+  until_version : String? = nil,
+  annotation_configurations : ACF::AnnotationConfigurations = ACF::AnnotationConfigurations.new
+) : ASR::PropertyMetadata forall I
+  context = ASR::PropertyMetadata(I, I, EmptyObject).new name, external_name, annotation_configurations, value, skip_when_empty, groups
 
   context.since_version = SemanticVersion.parse since_version if since_version
   context.until_version = SemanticVersion.parse until_version if until_version
