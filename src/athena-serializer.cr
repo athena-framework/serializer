@@ -47,7 +47,7 @@ module YAML; end
 # dependencies:
 #   athena-serializer:
 #     github: athena-framework/serializer
-#     version: ~> 0.1.0
+#     version: ~> 0.2.0
 # ```
 #
 # Run `shards install`.
