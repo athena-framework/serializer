@@ -4,6 +4,12 @@
 #
 # NOTE: Cannot be used for more than one action.
 abstract class Athena::Serializer::Context
+  # The possible (de)serialization actions.
+  enum Direction
+    Deserialization
+    Serialization
+  end
+
   # The `ASR::ExclusionStrategies::ExclusionStrategyInterface` being used.
   getter exclusion_strategy : ASR::ExclusionStrategies::ExclusionStrategyInterface?
 
@@ -14,6 +20,9 @@ abstract class Athena::Serializer::Context
 
   # Returns the version, if any, currently set on `self`.
   getter version : SemanticVersion? = nil
+
+  # Returns which (de)serialization action `self` represents.
+  abstract def direction : ASR::Context::Direction
 
   # Adds *strategy* to `self`.
   #

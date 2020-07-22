@@ -11,9 +11,11 @@ jobs:
     container:
       image: crystallang/crystal
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: shards install --production
       - name: Build
-        run: crystal docs
+        run: crystal docs lib/athena-config/src/athena-config.cr src/athena-serializer.cr
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@2.0.3
         env:
