@@ -80,7 +80,7 @@ module Athena::Serializer::Serializable
             # 3. Fallback on the name of the ivar
             {% external_name = if (name_ann = ivar.annotation(ASRA::Name)) && (serialized_name = name_ann[:serialize] || name_ann[:key])
                                  serialized_name
-                               elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:strategy])
+                               elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:serialization_strategy] || name_ann[:strategy])
                                  if strategy == :camelcase
                                    ivar_name.camelcase lower: true
                                  elsif strategy == :underscore
@@ -187,6 +187,7 @@ module Athena::Serializer::Serializable
                  end %}
 
             {{instance_vars.map do |ivar|
+                ivar_name = ivar.name.stringify
                 annotation_configurations = {} of Nil => Nil
 
                 ACF::CUSTOM_ANNOTATIONS.each do |ann_class|
@@ -203,9 +204,29 @@ module Athena::Serializer::Serializable
                   annotation_configurations[ann_class] = "#{annotations} of ACF::AnnotationConfigurations::ConfigurationBase".id unless annotations.empty?
                 end
 
+                # Determine the serialized name of the ivar:
+                # 1. If the ivar has an `ASRA::Name` annotation with a `deserialize` field, use that
+                # 2. If the type has an `ASRA::Name` annotation with a `strategy`, use that strategy
+                # 3. Fallback on the name of the ivar
+                external_name = if (name_ann = ivar.annotation(ASRA::Name)) && (deserialized_name = name_ann[:deserialize] || name_ann[:key])
+                                  deserialized_name
+                                elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:deserialization_strategy] || name_ann[:strategy])
+                                  if strategy == :camelcase
+                                    ivar_name.camelcase lower: true
+                                  elsif strategy == :underscore
+                                    ivar_name.underscore
+                                  elsif strategy == :identical
+                                    ivar_name
+                                  else
+                                    strategy.raise "Invalid ASRA::Name strategy: '#{strategy}'."
+                                  end
+                                else
+                                  ivar_name
+                                end
+
                 %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
                   name: #{ivar.name.stringify},
-                  external_name: #{(ann = ivar.annotation(ASRA::Name)) && (name = ann[:deserialize] || ann[:key]) ? name : ivar.name.stringify},
+                  external_name: #{external_name},
                   annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                   aliases: #{(ann = ivar.annotation(ASRA::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
                   groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},

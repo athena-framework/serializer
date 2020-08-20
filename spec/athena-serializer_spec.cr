@@ -199,9 +199,9 @@ describe ASR::Serializable do
         end
       end
 
-      describe :strategy do
+      describe :serialization_strategy do
         it :camelcase do
-          properties = SerializedNameCamelcaseStrategy.new.serialization_properties
+          properties = SerializedNameCamelcaseSerializationStrategy.new.serialization_properties
           properties.size.should eq 3
 
           p = properties[0]
@@ -221,7 +221,7 @@ describe ASR::Serializable do
         end
 
         it :underscore do
-          properties = SerializedNameUnderscoreStrategy.new.serialization_properties
+          properties = SerializedNameUnderscoreSerializationStrategy.new.serialization_properties
           properties.size.should eq 3
 
           p = properties[0]
@@ -241,7 +241,7 @@ describe ASR::Serializable do
         end
 
         it :identical do
-          properties = SerializedNameIdenticalStrategy.new.serialization_properties
+          properties = SerializedNameIdenticalSerializationStrategy.new.serialization_properties
           properties.size.should eq 3
 
           p = properties[0]
@@ -258,6 +258,148 @@ describe ASR::Serializable do
 
           p.name.should eq "myZipCode"
           p.external_name.should eq "myZipCode"
+        end
+      end
+
+      describe :deserialization_strategy do
+        it :camelcase do
+          properties = DeserializedNameCamelcaseDeserializationStrategy.deserialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "twoWOrds"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "myZipCode"
+        end
+
+        it :underscore do
+          properties = DeserializedNameUnderscoreDeserializationStrategy.deserialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "two_w_ords"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "my_zip_code"
+        end
+
+        it :identical do
+          properties = DeserializedNameIdenticalDeserializationStrategy.deserialization_properties
+          properties.size.should eq 3
+
+          p = properties[0]
+
+          p.name.should eq "my_home_address"
+          p.external_name.should eq "myAdd_ress"
+
+          p = properties[1]
+
+          p.name.should eq "two_wOrds"
+          p.external_name.should eq "two_wOrds"
+
+          p = properties[2]
+
+          p.name.should eq "myZipCode"
+          p.external_name.should eq "myZipCode"
+        end
+      end
+
+      describe :strategy do
+        it :camelcase do
+          both_properties = [
+            SerializedNameCamelcaseStrategy.new.serialization_properties,
+            SerializedNameCamelcaseStrategy.deserialization_properties,
+          ]
+
+          both_properties.each do |properties|
+            properties.size.should eq 3
+
+            p = properties[0]
+
+            p.name.should eq "my_home_address"
+            p.external_name.should eq "myAdd_ress"
+
+            p = properties[1]
+
+            p.name.should eq "two_wOrds"
+            p.external_name.should eq "twoWOrds"
+
+            p = properties[2]
+
+            p.name.should eq "myZipCode"
+            p.external_name.should eq "myZipCode"
+          end
+        end
+
+        it :underscore do
+          both_properties = [
+            SerializedNameUnderscoreStrategy.new.serialization_properties,
+            SerializedNameUnderscoreStrategy.deserialization_properties,
+          ]
+
+          both_properties.each do |properties|
+            properties.size.should eq 3
+
+            p = properties[0]
+
+            p.name.should eq "my_home_address"
+            p.external_name.should eq "myAdd_ress"
+
+            p = properties[1]
+
+            p.name.should eq "two_wOrds"
+            p.external_name.should eq "two_w_ords"
+
+            p = properties[2]
+
+            p.name.should eq "myZipCode"
+            p.external_name.should eq "my_zip_code"
+          end
+        end
+
+        it :identical do
+          both_properties = [
+            SerializedNameIdenticalStrategy.new.serialization_properties,
+            SerializedNameIdenticalStrategy.deserialization_properties,
+          ]
+
+          both_properties.each do |properties|
+            properties.size.should eq 3
+
+            p = properties[0]
+
+            p.name.should eq "my_home_address"
+            p.external_name.should eq "myAdd_ress"
+
+            p = properties[1]
+
+            p.name.should eq "two_wOrds"
+            p.external_name.should eq "two_wOrds"
+
+            p = properties[2]
+
+            p.name.should eq "myZipCode"
+            p.external_name.should eq "myZipCode"
+          end
         end
       end
     end
