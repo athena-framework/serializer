@@ -139,6 +139,29 @@ describe ASR::Serializable do
         end
       end
 
+      describe :deserialize do
+        it "should use the value in the annotation or property name if it wasnt defined" do
+          properties = DeserializedName.deserialization_properties
+          properties.size.should eq 2
+
+          p = properties[0]
+
+          p.name.should eq "custom_name"
+          p.external_name.should eq "des"
+          p.skip_when_empty?.should be_false
+          p.type.should eq Int32?
+          p.class.should eq DeserializedName
+
+          p = properties[1]
+
+          p.name.should eq "default_name"
+          p.external_name.should eq "default_name"
+          p.skip_when_empty?.should be_false
+          p.type.should eq Bool?
+          p.class.should eq DeserializedName
+        end
+      end
+
       describe :key do
         it "should use the value in the annotation or property name if it wasnt defined" do
           both_properties = [
