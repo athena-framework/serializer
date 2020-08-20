@@ -325,6 +325,7 @@ module Athena::Serializer::Annotations
   #
   # * `serialize : String` - The key to use for this property during serialization.
   # * `deserialize : String` - The key to use for this property during deserialization.
+  # * `key` : String - The key to use for this property during (de)serialization.
   # * `aliases : Array(String)` - A set of keys to use for this property during deserialization; is equivalent to multiple `deserialize` keys.
   # * `strategy : Symbol` - Defines the default serialization naming strategy for this type.  Can be overridden using the `serialize` field.
   #
@@ -342,6 +343,9 @@ module Athena::Serializer::Annotations
   #   @[ASRA::Name(deserialize: "some_key", serialize: "a_value")]
   #   property both_names : String = "str"
   #
+  #   @[ASRA::Name(key: "same")]
+  #   property same_in_both_directions : String = "same for both"
+  #
   #   @[ASRA::Name(aliases: ["val", "value", "some_value"])]
   #   property some_value : String = "some_val"
   # end
@@ -350,9 +354,10 @@ module Athena::Serializer::Annotations
   #
   # obj = ASR.serializer.deserialize Example, %({"my_home_address":"555 Mason Ave","some_key":"deserialized from diff key","value":"some_other_val"}), :json
   #
-  # obj.my_home_address # => "555 Mason Ave"
-  # obj.both_names      # => "deserialized from diff key"
-  # obj.some_value      # => "some_other_val"
+  # obj.my_home_address         # => "555 Mason Ave"
+  # obj.both_names              # => "deserialized from diff key"
+  # obj.same_in_both_directions # => "same again"
+  # obj.some_value              # => "some_other_val"
   # ```
   #
   # ### Naming Strategies
@@ -360,7 +365,7 @@ module Athena::Serializer::Annotations
   # By default the keys in the serialized data match exactly to the name of the property.
   # Naming strategies allow changing this behavior for all properties within the type.
   # The serialized name can still be overridden on a per-property basis via
-  # using the `ASRA::Name` annotation with the `serialize` field.
+  # using the `ASRA::Name` annotation with the `serialize` or `key` field.
   #
   # The available naming strategies include:
   # * `:camelcase`

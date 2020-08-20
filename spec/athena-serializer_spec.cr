@@ -139,6 +139,43 @@ describe ASR::Serializable do
         end
       end
 
+      describe :key do
+        it "should use the value in the annotation or property name if it wasnt defined" do
+          both_properties = [
+            SerializedNameKey.new.serialization_properties,
+            SerializedNameKey.deserialization_properties,
+          ]
+
+          both_properties.each do |properties|
+            properties.size.should eq 3
+
+            p = properties[0]
+
+            p.name.should eq "my_home_address"
+            p.external_name.should eq "myAddress"
+            p.skip_when_empty?.should be_false
+            p.type.should eq String
+            p.class.should eq SerializedNameKey
+
+            p = properties[1]
+
+            p.name.should eq "value"
+            p.external_name.should eq "some_key"
+            p.skip_when_empty?.should be_false
+            p.type.should eq String
+            p.class.should eq SerializedNameKey
+
+            p = properties[2]
+
+            p.name.should eq "myZipCode"
+            p.external_name.should eq "myZipCode"
+            p.skip_when_empty?.should be_false
+            p.type.should eq Int32
+            p.class.should eq SerializedNameKey
+          end
+        end
+      end
+
       describe :strategy do
         it :camelcase do
           properties = SerializedNameCamelcaseStrategy.new.serialization_properties

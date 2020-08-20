@@ -78,7 +78,7 @@ module Athena::Serializer::Serializable
             # 1. If the ivar has an `ASRA::Name` annotation with a `serialize` field, use that
             # 2. If the type has an `ASRA::Name` annotation with a `strategy`, use that strategy
             # 3. Fallback on the name of the ivar
-            {% external_name = if (name_ann = ivar.annotation(ASRA::Name)) && (serialized_name = name_ann[:serialize])
+            {% external_name = if (name_ann = ivar.annotation(ASRA::Name)) && (serialized_name = name_ann[:serialize] || name_ann[:key])
                                  serialized_name
                                elsif (name_ann = @type.annotation(ASRA::Name)) && (strategy = name_ann[:strategy])
                                  if strategy == :camelcase
@@ -205,7 +205,7 @@ module Athena::Serializer::Serializable
 
                 %(ASR::PropertyMetadata(#{ivar.type}, #{ivar.type}?, #{@type}).new(
                   name: #{ivar.name.stringify},
-                  external_name: #{(ann = ivar.annotation(ASRA::Name)) && (name = ann[:deserialize]) ? name : ivar.name.stringify},
+                  external_name: #{(ann = ivar.annotation(ASRA::Name)) && (name = ann[:deserialize] || ann[:key]) ? name : ivar.name.stringify},
                   annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                   aliases: #{(ann = ivar.annotation(ASRA::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
                   groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},

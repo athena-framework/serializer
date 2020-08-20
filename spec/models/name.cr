@@ -13,6 +13,22 @@ class SerializedName
   property myZipCode : Int32 = 90210
 end
 
+class SerializedNameKey
+  include ASR::Serializable
+
+  def initialize; end
+
+  @[ASRA::Name(key: "myAddress")]
+  property my_home_address : String = "123 Fake Street"
+
+  @[ASRA::Name(key: "some_key")]
+  property value : String = "str"
+
+  # ameba:disable Style/VariableNames
+  property myZipCode : Int32 = 90210
+end
+
+
 @[ASRA::Name(strategy: :camelcase)]
 class SerializedNameCamelcaseStrategy
   include ASR::Serializable
@@ -82,4 +98,13 @@ class AliasName
 
   @[ASRA::Name(aliases: ["val", "value", "some_value"])]
   property some_value : String?
+end
+
+class KeyName
+  include ASR::Serializable
+
+  def initialize; end
+
+  @[ASRA::Name(key: "firstName")]
+  property first_name : String?
 end
