@@ -325,8 +325,11 @@ module Athena::Serializer::Annotations
   #
   # * `serialize : String` - The key to use for this property during serialization.
   # * `deserialize : String` - The key to use for this property during deserialization.
+  # * `key` : String - The key to use for this property during (de)serialization.
   # * `aliases : Array(String)` - A set of keys to use for this property during deserialization; is equivalent to multiple `deserialize` keys.
-  # * `strategy : Symbol` - Defines the default serialization naming strategy for this type.  Can be overridden using the `serialize` field.
+  # * `serialization_strategy : Symbol` - Defines the default serialization naming strategy for this type.  Can be overridden using the `serialize` or `key` field.
+  # * `deserialization_strategy : Symbol` - Defines the default deserialization naming strategy for this type.  Can be overridden using the `deserialize` or `key` field.
+  # * `strategy : Symbol` - Defines the default (de)serialization naming strategy for this type.  Can be overridden using the `serialize`, `deserialize` or `key` fields.
   #
   # ## Example
   #
@@ -342,17 +345,21 @@ module Athena::Serializer::Annotations
   #   @[ASRA::Name(deserialize: "some_key", serialize: "a_value")]
   #   property both_names : String = "str"
   #
+  #   @[ASRA::Name(key: "same")]
+  #   property same_in_both_directions : String = "same for both"
+  #
   #   @[ASRA::Name(aliases: ["val", "value", "some_value"])]
   #   property some_value : String = "some_val"
   # end
   #
-  # ASR.serializer.serialize Example.new, :json # => {"myAddress":"123 Fake Street","a_value":"str","some_value":"some_val"}
+  # ASR.serializer.serialize Example.new, :json # => {"myAddress":"123 Fake Street","a_value":"str","same":"same for both","some_value":"some_val"}
   #
-  # obj = ASR.serializer.deserialize Example, %({"my_home_address":"555 Mason Ave","some_key":"deserialized from diff key","value":"some_other_val"}), :json
+  # obj = ASR.serializer.deserialize Example, %({"my_home_address":"555 Mason Ave","some_key":"deserialized from diff key","same":"same again","value":"some_other_val"}), :json
   #
-  # obj.my_home_address # => "555 Mason Ave"
-  # obj.both_names      # => "deserialized from diff key"
-  # obj.some_value      # => "some_other_val"
+  # obj.my_home_address         # => "555 Mason Ave"
+  # obj.both_names              # => "deserialized from diff key"
+  # obj.same_in_both_directions # => "same again"
+  # obj.some_value              # => "some_other_val"
   # ```
   #
   # ### Naming Strategies
@@ -360,7 +367,9 @@ module Athena::Serializer::Annotations
   # By default the keys in the serialized data match exactly to the name of the property.
   # Naming strategies allow changing this behavior for all properties within the type.
   # The serialized name can still be overridden on a per-property basis via
-  # using the `ASRA::Name` annotation with the `serialize` field.
+  # using the `ASRA::Name` annotation with the `serialize`, `deserialize` or `key` field.
+  # The strategy will be applied on serialization, deserialization or both, depending
+  # on whether `serialization_strategy`, `deserialization_strategy` or `strategy` is used.
   #
   # The available naming strategies include:
   # * `:camelcase`
