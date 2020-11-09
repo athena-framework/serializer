@@ -14,7 +14,7 @@ module Athena::Serializer::Any
   abstract def as_a
   abstract def as_a?
   abstract def is_nil? : Bool
-  abstract def dig(key, *keys)
+  abstract def dig(key_or_index : String | Int, *keys)
 
   abstract def raw
 end
