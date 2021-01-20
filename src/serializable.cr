@@ -149,6 +149,9 @@ module Athena::Serializer::Serializable
                 annotation_configurations: ACF::AnnotationConfigurations.new(#{method_annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                 value: #{m.name.id},
                 skip_when_empty: #{!!m.annotation(ASRA::SkipWhenEmpty)},
+                groups: #{(ann = m.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
+                since_version: #{(ann = m.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                until_version: #{(ann = m.annotation(ASRA::Until)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
               )).id %}
           {% end %}
 
