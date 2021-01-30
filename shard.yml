@@ -1,6 +1,6 @@
 name: athena-serializer
 
-version: 0.2.4
+version: 0.2.5
 
 crystal: '>= 0.35.0'
 
@@ -8,7 +8,7 @@ license: MIT
 
 repository: https://github.com/athena-framework/serializer
 
-documentation: https://athena-framework.github.io/serializer/Athena/Serializer.html
+documentation: https://athenaframework.org/Serializer
 
 description: |
   Object (de)serialization library.
