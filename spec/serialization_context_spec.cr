@@ -53,7 +53,7 @@ describe ASR::SerializationContext do
   describe "#groups=" do
     it "sets the groups" do
       context = ASR::SerializationContext.new.groups = ["one", "two"]
-      context.groups.should eq ["one", "two"]
+      context.groups.should eq Set{"one", "two"}
     end
 
     it "raises if the groups are empty" do

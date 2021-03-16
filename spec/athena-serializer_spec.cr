@@ -428,7 +428,7 @@ describe ASR::Serializable do
         p = properties[0]
 
         p.name.should eq "foo"
-        p.groups.should eq ["default"]
+        p.groups.should eq Set{"default"}
         p.since_version.should be_nil
         p.until_version.should be_nil
         p.external_name.should eq "foo"
@@ -440,7 +440,7 @@ describe ASR::Serializable do
         p = properties[1]
 
         p.name.should eq "get_val"
-        p.groups.should eq ["default"]
+        p.groups.should eq Set{"default"}
         p.since_version.should be_nil
         p.until_version.should be_nil
         p.external_name.should eq "get_val"
@@ -452,7 +452,7 @@ describe ASR::Serializable do
         p = properties[2]
 
         p.name.should eq "group_version"
-        p.groups.should eq ["group1"]
+        p.groups.should eq Set{"group1"}
         p.since_version.should eq SemanticVersion.parse "1.3.2"
         p.until_version.should eq SemanticVersion.parse "1.2.3"
         p.external_name.should eq "group_version"
