@@ -19,7 +19,7 @@ abstract class Athena::Serializer::Context
   getter groups : Array(String)? = nil
 
   # Returns the version, if any, currently set on `self`.
-  getter version : SemanticVersion? = nil
+  property version : SemanticVersion? = nil
 
   # Returns which (de)serialization action `self` represents.
   abstract def direction : ASR::Context::Direction
