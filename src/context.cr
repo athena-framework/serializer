@@ -16,10 +16,10 @@ abstract class Athena::Serializer::Context
   @initialized : Bool = false
 
   # Returns the serialization groups, if any, currently set on `self`.
-  getter groups : Array(String)? = nil
+  getter groups : Set(String)? = nil
 
   # Returns the version, if any, currently set on `self`.
-  getter version : SemanticVersion? = nil
+  property version : SemanticVersion? = nil
 
   # Returns which (de)serialization action `self` represents.
   abstract def direction : ASR::Context::Direction
@@ -59,10 +59,10 @@ abstract class Athena::Serializer::Context
   # Sets the group(s) to compare against properties' `ASRA::Groups` annotations.
   #
   # Adds a `ASR::ExclusionStrategies::Groups` automatically if set.
-  def groups=(groups : Array(String)) : self
+  def groups=(groups : Enumerable(String)) : self
     raise ArgumentError.new "Groups cannot be empty" if groups.empty?
 
-    @groups = groups
+    @groups = groups.to_set
 
     self
   end

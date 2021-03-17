@@ -37,7 +37,7 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
   # The serialization groups this property belongs to.
   #
   # See `ASR::ExclusionStrategies::Groups`.
-  getter groups : Array(String) = ["default"]
+  getter groups : Set(String) = Set{"default"}
 
   # Deserialize this property from the property's name or any name in *aliases*.
   #
@@ -60,12 +60,13 @@ struct Athena::Serializer::PropertyMetadata(IvarType, ValueType, ClassType)
     @annotation_configurations : ACF::AnnotationConfigurations,
     @value : ValueType = nil,
     @skip_when_empty : Bool = false,
-    @groups : Array(String) = ["default"],
+    groups : Enumerable(String) = ["default"],
     @aliases : Array(String) = [] of String,
     @since_version : SemanticVersion? = nil,
     @until_version : SemanticVersion? = nil,
     @type : IvarType.class = IvarType,
     @class : ClassType.class = ClassType
   )
+    @groups = groups.to_set
   end
 end

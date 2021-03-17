@@ -16,7 +16,7 @@ describe ASR::Navigators::SerializationNavigator do
           p.external_name.should eq "name"
           p.value.should eq "NAME"
           p.skip_when_empty?.should be_false
-          p.groups.should eq ["default"] of String
+          p.groups.should eq Set{"default"}
           p.type.should eq String?
           p.class.should eq PreSerialize
 
@@ -26,7 +26,7 @@ describe ASR::Navigators::SerializationNavigator do
           p.external_name.should eq "age"
           p.value.should eq 123
           p.skip_when_empty?.should be_false
-          p.groups.should eq ["default"] of String
+          p.groups.should eq Set{"default"}
           p.type.should eq Int32?
           p.class.should eq PreSerialize
         end
@@ -52,7 +52,7 @@ describe ASR::Navigators::SerializationNavigator do
           p.external_name.should eq "name"
           p.value.should eq "NAME"
           p.skip_when_empty?.should be_false
-          p.groups.should eq ["default"] of String
+          p.groups.should eq Set{"default"}
           p.type.should eq String?
           p.class.should eq PostSerialize
 
@@ -62,7 +62,7 @@ describe ASR::Navigators::SerializationNavigator do
           p.external_name.should eq "age"
           p.value.should eq 123
           p.skip_when_empty?.should be_false
-          p.groups.should eq ["default"] of String
+          p.groups.should eq Set{"default"}
           p.type.should eq Int32?
           p.class.should eq PostSerialize
         end
@@ -97,7 +97,7 @@ describe ASR::Navigators::SerializationNavigator do
           p.external_name.should eq "value"
           p.value.should eq "value"
           p.skip_when_empty?.should be_true
-          p.groups.should eq ["default"] of String
+          p.groups.should eq Set{"default"}
           p.type.should eq String
           p.class.should eq SkipWhenEmpty
         end
@@ -119,7 +119,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "age"
             p.value.should eq 1
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["default"] of String
+            p.groups.should eq Set{"default"}
             p.type.should eq Int32
             p.class.should eq EmitNil
           end
@@ -142,7 +142,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "name"
             p.value.should be_nil
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["default"] of String
+            p.groups.should eq Set{"default"}
             p.type.should eq String?
             p.class.should eq EmitNil
 
@@ -152,7 +152,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "age"
             p.value.should eq 1
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["default"] of String
+            p.groups.should eq Set{"default"}
             p.type.should eq Int32
             p.class.should eq EmitNil
           end
@@ -176,7 +176,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "id"
             p.value.should eq 1
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list", "details"]
+            p.groups.should eq Set{"list", "details"}
             p.type.should eq Int64
             p.class.should eq Group
 
@@ -186,7 +186,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "comment_summaries"
             p.value.should eq ["Sentence 1.", "Sentence 2."]
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list"]
+            p.groups.should eq Set{"list"}
             p.type.should eq Array(String)
             p.class.should eq Group
 
@@ -196,7 +196,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "comments"
             p.value.should eq ["Sentence 1.  Another sentence.", "Sentence 2.  Some other stuff."]
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["details"]
+            p.groups.should eq Set{"details"}
             p.type.should eq Array(String)
             p.class.should eq Group
 
@@ -206,7 +206,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "created_at"
             p.value.should eq Time.utc(2019, 1, 1)
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["default"]
+            p.groups.should eq Set{"default"}
             p.type.should eq Time
             p.class.should eq Group
           end
@@ -233,7 +233,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "id"
             p.value.should eq 1
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list", "details"]
+            p.groups.should eq Set{"list", "details"}
             p.type.should eq Int64
             p.class.should eq Group
 
@@ -243,7 +243,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "comment_summaries"
             p.value.should eq ["Sentence 1.", "Sentence 2."]
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list"]
+            p.groups.should eq Set{"list"}
             p.type.should eq Array(String)
             p.class.should eq Group
           end
@@ -270,7 +270,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "id"
             p.value.should eq 1
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list", "details"]
+            p.groups.should eq Set{"list", "details"}
             p.type.should eq Int64
             p.class.should eq Group
 
@@ -280,7 +280,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "comment_summaries"
             p.value.should eq ["Sentence 1.", "Sentence 2."]
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["list"]
+            p.groups.should eq Set{"list"}
             p.type.should eq Array(String)
             p.class.should eq Group
 
@@ -290,7 +290,7 @@ describe ASR::Navigators::SerializationNavigator do
             p.external_name.should eq "created_at"
             p.value.should eq Time.utc(2019, 1, 1)
             p.skip_when_empty?.should be_false
-            p.groups.should eq ["default"]
+            p.groups.should eq Set{"default"}
             p.type.should eq Time
             p.class.should eq Group
           end

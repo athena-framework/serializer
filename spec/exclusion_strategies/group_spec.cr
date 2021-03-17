@@ -19,5 +19,10 @@ describe ASR::ExclusionStrategies::Groups do
         assert_groups(groups: ["one", "two"], metadata_groups: ["three", "four"]).should be_true
       end
     end
+
+    it "splat argument" do
+      ASR::ExclusionStrategies::Groups.new("one", "two", "three").skip_property?(create_metadata(groups: ["default"]), ASR::SerializationContext.new).should be_true
+      ASR::ExclusionStrategies::Groups.new("one", "default", "three").skip_property?(create_metadata(groups: ["default"]), ASR::SerializationContext.new).should be_false
+    end
   end
 end

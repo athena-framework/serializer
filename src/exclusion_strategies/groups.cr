@@ -36,12 +36,14 @@ require "./exclusion_strategy_interface"
 struct Athena::Serializer::ExclusionStrategies::Groups
   include Athena::Serializer::ExclusionStrategies::ExclusionStrategyInterface
 
-  @groups : Array(String)
+  @groups : Set(String)
 
-  def initialize(@groups : Array(String)); end
+  def initialize(groups : Enumerable(String))
+    @groups = groups.to_set
+  end
 
   def self.new(*groups : String)
-    new groups.to_a
+    new groups
   end
 
   # :inherit:

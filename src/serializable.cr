@@ -33,21 +33,21 @@ module Athena::Serializer::Serializable
 
       # :nodoc:
       def run_preserialize : Nil
-        {% for method in @type.methods.select { |m| m.annotation(ASRA::PreSerialize) } %}
+        {% for method in @type.methods.select &.annotation(ASRA::PreSerialize) %}
           {{method.name}}
         {% end %}
       end
 
       # :nodoc:
       def run_postserialize : Nil
-        {% for method in @type.methods.select { |m| m.annotation(ASRA::PostSerialize) } %}
+        {% for method in @type.methods.select &.annotation(ASRA::PostSerialize) %}
           {{method.name}}
         {% end %}
       end
 
       # :nodoc:
       def run_postdeserialize : Nil
-        {% for method in @type.methods.select { |m| m.annotation(ASRA::PostDeserialize) } %}
+        {% for method in @type.methods.select &.annotation(ASRA::PostDeserialize) %}
           {{method.name}}
         {% end %}
       end
@@ -59,8 +59,8 @@ module Athena::Serializer::Serializable
           # Takes into consideration some annotations to control how/when a property should be serialized
           {%
             instance_vars = @type.instance_vars
-              .reject { |ivar| ivar.annotation(ASRA::Skip) }
-              .reject { |ivar| ivar.annotation(ASRA::IgnoreOnSerialize) }
+              .reject(&.annotation(ASRA::Skip))
+              .reject(&.annotation(ASRA::IgnoreOnSerialize))
               .reject do |ivar|
                 not_exposed = (ann = @type.annotation(ASRA::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASRA::Expose)
                 excluded = (ann = @type.annotation(ASRA::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASRA::Exclude)
@@ -122,7 +122,7 @@ module Athena::Serializer::Serializable
               )).id %}
             {% end %}
 
-          {% for m in @type.methods.select { |method| method.annotation(ASRA::VirtualProperty) } %}
+          {% for m in @type.methods.select &.annotation(ASRA::VirtualProperty) %}
             {% method_name = m.name %}
             {% m.raise "ASRA::VirtualProperty return type must be set for '#{@type.name}##{method_name}'." if m.return_type.is_a? Nop %}
             {% external_name = (ann = m.annotation(ASRA::Name)) && (name = ann[:serialize]) ? name : m.name.stringify %}
@@ -179,9 +179,9 @@ module Athena::Serializer::Serializable
             # Construct the array of metadata from the properties on `self`.
             # Takes into consideration some annotations to control how/when a property should be serialized
             {% instance_vars = @type.instance_vars
-                 .reject { |ivar| ivar.annotation(ASRA::Skip) }
+                 .reject(&.annotation(ASRA::Skip))
                  .reject { |ivar| (ann = ivar.annotation(ASRA::ReadOnly)); ann && !ivar.has_default_value? && !ivar.type.nilable? ? ivar.raise "#{@type}##{ivar.name} is read-only but is not nilable nor has a default value" : ann }
-                 .reject { |ivar| ivar.annotation(ASRA::IgnoreOnDeserialize) }
+                 .reject(&.annotation(ASRA::IgnoreOnDeserialize))
                  .reject do |ivar|
                    not_exposed = (ann = @type.annotation(ASRA::ExclusionPolicy)) && ann[0] == :all && !ivar.annotation(ASRA::Expose)
                    excluded = (ann = @type.annotation(ASRA::ExclusionPolicy)) && ann[0] == :none && ivar.annotation(ASRA::Exclude)
