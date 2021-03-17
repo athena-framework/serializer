@@ -43,7 +43,7 @@ struct Athena::Serializer::ExclusionStrategies::Groups
   end
 
   def self.new(*groups : String)
-    new groups.to_set
+    new groups
   end
 
   # :inherit:
