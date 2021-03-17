@@ -1,6 +1,6 @@
 name: athena-serializer
 
-version: 0.2.5
+version: 0.3.0
 
 crystal: '>= 0.35.0'
 
@@ -19,8 +19,7 @@ authors:
 dependencies:
   athena-config:
     github: athena-framework/config
-    branch: deprecate-configuration-resolver
-    # version: '>= 0.2.0'
+    version: '>= 0.2.0'
 
 development_dependencies:
   ameba:
