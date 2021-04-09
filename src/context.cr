@@ -2,7 +2,8 @@
 #
 # Such as what serialization groups/version to use when serializing.
 #
-# NOTE: Cannot be used for more than one action.
+# !!!warning
+#     Cannot be used for more than one action.
 abstract class Athena::Serializer::Context
   # The possible (de)serialization actions.
   enum Direction
