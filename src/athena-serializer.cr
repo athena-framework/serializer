@@ -17,6 +17,7 @@ require "./deserialization_context"
 require "./serialization_context"
 
 require "./construction/*"
+require "./exceptions/*"
 require "./exclusion_strategies/*"
 require "./navigators/*"
 require "./visitors/*"

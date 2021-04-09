@@ -43,7 +43,7 @@ abstract class Athena::Serializer::Context
 
   # :nodoc:
   def init : Nil
-    raise Exception.new "This context was already initialized, and cannot be re-used." if @initialized
+    raise ASR::Exceptions::SerializerException.new "This context was already initialized, and cannot be re-used." if @initialized
 
     if v = @version
       add_exclusion_strategy ASR::ExclusionStrategies::Version.new v

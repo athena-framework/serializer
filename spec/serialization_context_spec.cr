@@ -10,6 +10,31 @@ struct False
 end
 
 describe ASR::SerializationContext do
+  describe "#init" do
+    it "that wasn't already inited" do
+      context = ASR::SerializationContext.new
+      context.groups = {"group1"}
+      context.version = "1.0.0"
+
+      context.exclusion_strategy.should be_nil
+
+      context.init
+
+      context.exclusion_strategy.should be_a ASR::ExclusionStrategies::Disjunct
+      context.exclusion_strategy.try &.as(ASR::ExclusionStrategies::Disjunct).members.size.should eq 2
+    end
+
+    it "that was already inited" do
+      context = ASR::SerializationContext.new
+
+      context.init
+
+      expect_raises ASR::Exceptions::SerializerException, "This context was already initialized, and cannot be re-used." do
+        context.init
+      end
+    end
+  end
+
   describe "#add_exclusion_strategy" do
     describe "with no previous strategy" do
       it "should set it directly" do

@@ -41,7 +41,7 @@ end
     def {{type}}.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, data : ASR::Any)
       data{{method.id}}
     rescue ex : TypeCastError
-      raise "Could not parse {{type}} from '#{data.inspect}'."
+      raise ASR::Exceptions::DeserializationException.new "Could not parse {{type}} from '#{data.inspect}'."
     end
   {% end %}
 {% end %}
@@ -127,7 +127,7 @@ def NamedTuple.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterf
 
     {% for key, type in T %}
       if %var{key.id}.nil? && !{{type.nilable?}}
-        raise "Missing required attribute: '{{key}}'"
+        raise ASR::Exceptions::MissingRequiredProperty.new {{key.id.stringify}}, {{type.id.stringify}}
       end
     {% end %}
 
@@ -146,7 +146,7 @@ def Enum.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, d
   elsif val = data.as_s?
     parse val
   else
-    raise "Couldn't parse #{self} from '#{data}'."
+    raise ASR::Exceptions::DeserializationException.new "Couldn't parse #{self} from '#{data}'."
   end
 end
 
@@ -192,5 +192,5 @@ def Union.deserialize(visitor : ASR::Visitors::DeserializationVisitorInterface, 
     {% end %}
   {% end %}
 
-  raise "Couldn't parse #{self} from '#{data}'."
+  raise ASR::Exceptions::DeserializationException.new "Couldn't parse #{self} from '#{data}'."
 end
