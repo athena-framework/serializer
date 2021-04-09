@@ -228,7 +228,8 @@ module Athena::Serializer::Annotations
   # ASR.serializer.deserialize Example, %({"name":"Jim","password":"password1!"}), :json # => #<Example:0x7f6eec4b6a60 @name="Jim", @password="monkey">
   # ```
   #
-  # NOTE: On deserialization, the excluded property must be nilable, or have a default value.
+  # !!!warning
+  #     On deserialization, the excluded properties must be nilable, or have a default value.
   annotation Exclude; end
 
   # Defines the default exclusion policy to use on a class.  Valid values: `:none`, and `:all`.
@@ -259,7 +260,8 @@ module Athena::Serializer::Annotations
   # ASR.serializer.deserialize Example, %({"name":"Jim","password":"password1!"}), :json # => #<Example:0x7f6eec4b6a60 @name="Jim", @password="monkey">
   # ```
   #
-  # NOTE: On deserialization, the excluded property must be nilable, or have a default value.
+  # !!!warning
+  #     On deserialization, the excluded properties must be nilable, or have a default value.
   annotation Expose; end
 
   # Defines the group(s) a property belongs to.  Properties are automatically added to the `default` group
@@ -498,14 +500,16 @@ module Athena::Serializer::Annotations
   # obj.password # => nil
   # ```
   #
-  # NOTE: The property must be nilable, or have a default value.
+  # !!!warning
+  #     The property must be nilable, or have a default value.
   annotation ReadOnly; end
 
   # Represents the first version a property was available.
   #
   # See `ASR::ExclusionStrategies::Version`.
   #
-  # NOTE: Value must be a `SemanticVersion` version.
+  # !!!note
+  #     Value must be a `SemanticVersion` version.
   annotation Since; end
 
   # Indicates that a property should not be serialized or deserialized.
@@ -558,14 +562,16 @@ module Athena::Serializer::Annotations
   # ASR.serializer.serialize obj, :json # => {"id":1}
   # ```
   #
-  # NOTE: Can be used on any type that defines an `#empty?` method.
+  # !!!tip:
+  #     Can be used on any type that defines an `#empty?` method.
   annotation SkipWhenEmpty; end
 
   # Represents the last version a property was available.
   #
   # See `ASR::ExclusionStrategies::Version`.
   #
-  # NOTE: Value must be a `SemanticVersion` version.
+  # !!!note
+  #     Value must be a `SemanticVersion` version.
   annotation Until; end
 
   # Can be applied to a method to make it act like a property.
@@ -595,6 +601,7 @@ module Athena::Serializer::Annotations
   # ASR.serializer.serialize Example.new, :json # => {"foo":"foo","testing":false,"get_val":"VAL"}
   # ```
   #
-  # NOTE: The return type restriction _MUST_ be defined.
+  # !!!warning
+  #     The return type restriction _MUST_ be defined.
   annotation VirtualProperty; end
 end

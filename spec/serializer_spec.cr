@@ -76,15 +76,21 @@ describe ASR::Serializer do
     describe ASR::Serializable do
       describe NotNilableModel do
         it "missing" do
-          expect_raises Exception, "Missing required attribute: 'not_nilable'." do
+          ex = expect_raises ASR::Exceptions::MissingRequiredProperty, "Missing required property: 'not_nilable'." do
             ASR.serializer.deserialize NotNilableModel, %({}), :json
           end
+
+          ex.property_name.should eq "not_nilable"
+          ex.property_type.should eq "String"
         end
 
         it nil do
-          expect_raises Exception, "Required property 'not_nilable_not_serializable' cannot be nil." do
+          ex = expect_raises ASR::Exceptions::NilRequiredProperty, "Required property 'not_nilable_not_serializable' cannot be nil." do
             ASR.serializer.deserialize NotNilableModel, %({"not_nilable":"FOO","not_nilable_not_serializable":null}), :json
           end
+
+          ex.property_name.should eq "not_nilable_not_serializable"
+          ex.property_type.should eq "Unserializable"
         end
       end
 
@@ -100,15 +106,19 @@ describe ASR::Serializer do
         end
 
         it "missing discriminator" do
-          expect_raises(Exception, "Missing discriminator field 'type'.") do
+          ex = expect_raises ASR::Exceptions::PropertyException, "Missing discriminator field 'type'." do
             ASR.serializer.deserialize Shape, %({"x":1,"y":2}), :json
           end
+
+          ex.property_name.should eq "type"
         end
 
         it "unknown discriminator value" do
-          expect_raises(Exception, "Unknown 'type' discriminator value: 'triangle'.") do
+          ex = expect_raises(ASR::Exceptions::PropertyException, "Unknown 'type' discriminator value: 'triangle'.") do
             ASR.serializer.deserialize Shape, %({"x":1,"y":2,"type":"triangle"}), :json
           end
+
+          ex.property_name.should eq "type"
         end
       end
 
@@ -159,7 +169,7 @@ describe ASR::Serializer do
 
     describe "primitive" do
       it nil do
-        expect_raises Exception, "Could not parse String from 'nil'." do
+        expect_raises ASR::Exceptions::DeserializationException, "Could not parse String from 'nil'." do
           ASR.serializer.deserialize String, "null", :json
         end
       end

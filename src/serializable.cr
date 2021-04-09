@@ -261,12 +261,12 @@ module Athena::Serializer::Serializable
                 @{{ivar.id}} = value
               else
                 {% if !ivar.type.nilable? && !ivar.has_default_value? %}
-                  raise Exception.new "Required property '{{ivar}}' cannot be nil."
+                  raise ASR::Exceptions::NilRequiredProperty.new {{ivar.name.id.stringify}}, {{ivar.type.id.stringify}}
                 {% end %}
               end
             else
               {% if !ivar.type.nilable? && !ivar.has_default_value? %}
-                raise Exception.new "Missing required attribute: '{{ivar}}'."
+                raise ASR::Exceptions::MissingRequiredProperty.new {{ivar.name.id.stringify}}, {{ivar.type.id.stringify}}
               {% end %}
             end
 

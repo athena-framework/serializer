@@ -2,7 +2,8 @@
 #
 # Such as what serialization groups/version to use when serializing.
 #
-# NOTE: Cannot be used for more than one action.
+# !!!warning
+#     Cannot be used for more than one action.
 abstract class Athena::Serializer::Context
   # The possible (de)serialization actions.
   enum Direction
@@ -43,7 +44,7 @@ abstract class Athena::Serializer::Context
 
   # :nodoc:
   def init : Nil
-    raise Exception.new "This context was already initialized, and cannot be re-used." if @initialized
+    raise ASR::Exceptions::SerializerException.new "This context was already initialized, and cannot be re-used." if @initialized
 
     if v = @version
       add_exclusion_strategy ASR::ExclusionStrategies::Version.new v

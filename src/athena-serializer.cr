@@ -17,6 +17,7 @@ require "./deserialization_context"
 require "./serialization_context"
 
 require "./construction/*"
+require "./exceptions/*"
 require "./exclusion_strategies/*"
 require "./navigators/*"
 require "./visitors/*"
@@ -153,7 +154,8 @@ module Athena::Serializer
   #
   # Custom strategies can be implemented by via `ExclusionStrategies::ExclusionStrategyInterface`.
   #
-  # OPTIMIZE:  Once feasible, support compile time exclusion strategies.
+  # !!!todo
+  #     Once feasible, support compile time exclusion strategies.
   module Athena::Serializer::ExclusionStrategies; end
 
   # Used to denote a type that is (de)serializable.
