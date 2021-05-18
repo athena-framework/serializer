@@ -114,11 +114,11 @@ module Athena::Serializer::Serializable
                 name: #{ivar.name.stringify},
                 external_name: #{external_name},
                 annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
-                value: #{(accessor = ivar.annotation(ASRA::Accessor)) && accessor[:getter] != nil ? accessor[:getter].id : %(@#{ivar.id}).id},
+                value: #{(accessor = ivar.annotation(ASRA::Accessor)) && nil != accessor[:getter] ? accessor[:getter].id : %(@#{ivar.id}).id},
                 skip_when_empty: #{!!ivar.annotation(ASRA::SkipWhenEmpty)},
                 groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
-                since_version: #{(ann = ivar.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
-                until_version: #{(ann = ivar.annotation(ASRA::Until)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                since_version: #{(ann = ivar.annotation(ASRA::Since)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                until_version: #{(ann = ivar.annotation(ASRA::Until)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
               )).id %}
             {% end %}
 
@@ -150,15 +150,15 @@ module Athena::Serializer::Serializable
                 value: #{m.name.id},
                 skip_when_empty: #{!!m.annotation(ASRA::SkipWhenEmpty)},
                 groups: #{(ann = m.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
-                since_version: #{(ann = m.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
-                until_version: #{(ann = m.annotation(ASRA::Until)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                since_version: #{(ann = m.annotation(ASRA::Since)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                until_version: #{(ann = m.annotation(ASRA::Until)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
               )).id %}
           {% end %}
 
-          {% if (ann = @type.annotation(ASRA::AccessorOrder)) && !ann[0].nil? %}
+          {% if (ann = @type.annotation(ASRA::AccessorOrder)) && nil != ann[0] %}
             {% if ann[0] == :alphabetical %}
               {% properties = property_hash.keys.sort.map { |key| property_hash[key] } %}
-            {% elsif ann[0] == :custom && !ann[:order].nil? %}
+            {% elsif ann[0] == :custom && nil != ann[:order] %}
               {% ann.raise "Not all properties were defined in the custom order for '#{@type}'." unless property_hash.keys.all? { |prop| ann[:order].map(&.id.stringify).includes? prop } %}
               {% properties = ann[:order].map { |val| property_hash[val.id.stringify] || raise "Unknown instance variable: '#{val.id}'." } %}
             {% else %}
@@ -233,8 +233,8 @@ module Athena::Serializer::Serializable
                   annotation_configurations: ACF::AnnotationConfigurations.new(#{annotation_configurations} of ACF::AnnotationConfigurations::Classes => Array(ACF::AnnotationConfigurations::ConfigurationBase)),
                   aliases: #{(ann = ivar.annotation(ASRA::Name)) && (aliases = ann[:aliases]) ? aliases : "[] of String".id},
                   groups: #{(ann = ivar.annotation(ASRA::Groups)) && !ann.args.empty? ? [ann.args.splat] : ["default"]},
-                  since_version: #{(ann = ivar.annotation(ASRA::Since)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
-                  until_version: #{(ann = ivar.annotation(ASRA::Until)) && !ann[0].nil? ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                  since_version: #{(ann = ivar.annotation(ASRA::Since)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
+                  until_version: #{(ann = ivar.annotation(ASRA::Until)) && nil != ann[0] ? "SemanticVersion.parse(#{ann[0]})".id : nil},
                 )).id
               end}} of ASR::PropertyMetadataBase
           {% end %}
