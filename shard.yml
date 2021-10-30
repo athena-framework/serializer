@@ -1,6 +1,6 @@
 name: athena-serializer
 
-version: 0.2.8
+version: 0.2.9
 
 crystal: '>= 0.35.0'
 

@@ -121,6 +121,8 @@ module YAML; end
 # ASR.serializer.serialize obj, :json, ASR::SerializationContext.new.groups = ["details"] # => {"name":"FIRST LAST","title":"title"}
 # ```
 module Athena::Serializer
+  VERSION = "0.2.9"
+
   # Returns an `ASR::SerializerInterface` instance for ad-hoc (de)serialization.
   #
   # The serializer is cached and only instantiated once.
