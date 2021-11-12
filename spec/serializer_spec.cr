@@ -57,6 +57,12 @@ class ReverseConverterModel
   getter str : String
 end
 
+class SingleNilablePropertyModel
+  include ASR::Serializable
+
+  property my_prop : String?
+end
+
 abstract struct BaseModel
   include ASR::Model
 end
@@ -127,6 +133,11 @@ describe ASR::Serializer do
           obj = ASR.serializer.deserialize NilableModel, %({"nilable":"FOO","nilable_not_serializable":{"id":10}}), :json
           obj.nilable.should eq "FOO"
           obj.nilable_not_serializable.should be_nil
+        end
+
+        it "should still return an instance if the input is empty" do
+          ASR.serializer.deserialize(SingleNilablePropertyModel, "{}", :json).my_prop.should be_nil
+          ASR.serializer.deserialize(SingleNilablePropertyModel, "", :yaml).my_prop.should be_nil
         end
       end
 

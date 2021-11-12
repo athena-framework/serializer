@@ -280,6 +280,8 @@ module Athena::Serializer::Serializable
       # Attempts to extract a value from the *data* for the given *property*.
       # Returns `nil` if a value could not be extracted.
       private def extract_value(property : ASR::PropertyMetadataBase, data : ASR::Any, path : Tuple?) : ASR::Any?
+        return nil if data.raw.nil?
+
         if path && (value = data.dig?(*path))
           return value
         end
