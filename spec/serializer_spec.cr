@@ -107,8 +107,63 @@ describe ASR::Serializer do
       end
 
       describe ASRA::Discriminator do
-        it "happy path" do
-          ASR.serializer.deserialize(Shape, %({"x":1,"y":2,"type":"point"}), :json).should be_a Point
+        context "when input is valid" do
+          it "should parse a point" do
+            ASR.serializer.deserialize(Shape, %({"x":1,"y":2,"type":"point"}), :json).should be_a Point
+          end
+
+          it "should parse a triangle" do
+            ASR.serializer.deserialize(Polygon, <<-JSON, :json).should be_a Triangle
+            {
+              "type": "triangle",
+              "p1":{
+                "x": 0,
+                "y": 0,
+                "type": "point"
+              },
+              "p2":{
+                "x": 0,
+                "y": 1,
+                "type": "point"
+              },
+              "p3":{
+                "x": 1,
+                "y": 1,
+                "type": "point"
+              }
+            }
+            JSON
+          end
+          
+          it "should fallback to default type" do
+            ASR.serializer.deserialize(Polygon, <<-JSON, :json).should be_a GenericPolygon
+            {
+              "type": "quadrilateral",
+              "vertices": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "type": "point"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "type": "point"
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "type": "point"
+                },
+                {
+                  "x": 1,
+                  "y": 1,
+                  "type": "point"
+                }
+              ]
+            }
+            JSON
+          end
         end
 
         it "missing discriminator" do

@@ -24,7 +24,11 @@ struct Athena::Serializer::Navigators::DeserializationNavigator
               when {{k.id.stringify}} then {{t}}
             {% end %}
           else
-            raise ASR::Exceptions::PropertyException.new "Unknown '#{{{ann[:key]}}}' discriminator value: '#{key}'.", {{ann[:key].id.stringify}}
+            {% if ann[:default] %}
+              {{ann[:default]}}
+            {% else %}
+              raise ASR::Exceptions::PropertyException.new "Unknown '#{{{ann[:key]}}}' discriminator value: '#{key}'.", {{ann[:key].id.stringify}}
+            {% end %}
           end
         else
           raise ASR::Exceptions::PropertyException.new "Missing discriminator field '#{{{ann[:key]}}}'.", {{ann[:key].id.stringify}}
